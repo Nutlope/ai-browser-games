@@ -1,0 +1,76 @@
+{
+  "provider": "Together",
+  "generatedAt": "2026-04-10T19:42:57.998Z",
+  "successCount": 8,
+  "failureCount": 2,
+  "successes": [
+    {
+      "model": "MiniMaxAI/MiniMax-M2.5",
+      "game": "Snake",
+      "outputTokens": 5993,
+      "totalTokens": 6145,
+      "costUsd": 0.007237
+    },
+    {
+      "model": "MiniMaxAI/MiniMax-M2.5",
+      "game": "Flappy",
+      "outputTokens": 5255,
+      "totalTokens": 5402,
+      "costUsd": 0.00635
+    },
+    {
+      "model": "moonshotai/Kimi-K2.5",
+      "game": "Flappy",
+      "outputTokens": 4027,
+      "totalTokens": 4170,
+      "costUsd": 0.011347
+    },
+    {
+      "model": "zai-org/GLM-5.1",
+      "game": "Snake",
+      "outputTokens": 1877,
+      "totalTokens": 2018,
+      "costUsd": 0.008456
+    },
+    {
+      "model": "zai-org/GLM-5.1",
+      "game": "Flappy",
+      "outputTokens": 2019,
+      "totalTokens": 2155,
+      "costUsd": 0.009074
+    },
+    {
+      "model": "openai/gpt-oss-120b",
+      "game": "Snake",
+      "outputTokens": 1299,
+      "totalTokens": 1509,
+      "costUsd": 0.000811
+    },
+    {
+      "model": "openai/gpt-oss-120b",
+      "game": "Flappy",
+      "outputTokens": 1268,
+      "totalTokens": 1473,
+      "costUsd": 0.000792
+    },
+    {
+      "model": "google/gemma-4-31B-it",
+      "game": "Snake",
+      "outputTokens": 2315,
+      "totalTokens": 2492,
+      "costUsd": 0.001193
+    }
+  ],
+  "failures": [
+    {
+      "model": "moonshotai/Kimi-K2.5",
+      "game": "Snake",
+      "error": "Model returned an empty response."
+    },
+    {
+      "model": "google/gemma-4-31B-it",
+      "game": "Flappy",
+      "error": "500 Internal Server Error: {\n  \"id\": \"oecoM4u-zfFMX-9ea43cd8eefbcd8b\",\n  \"error\": {\n    \"message\": \"Internal server error\",\n    \"type\": \"server_error\",\n    \"param\": null,\n    \"code\": null\n  }\n}"
+    }
+  ]
+}
