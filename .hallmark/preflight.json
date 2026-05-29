@@ -1,0 +1,8 @@
+{
+  "date": "2026-05-01",
+  "framework": "Next.js 15",
+  "fontStack": "Georgia serif replaced with JetBrains Mono / IBM Plex Sans fallbacks",
+  "palette": "Terminal dark OKLCH tokens in app/globals.css",
+  "motion": "motion-cut; CSS transitions only",
+  "spacing": "local CSS modules, compact 8px workbench rhythm"
+}

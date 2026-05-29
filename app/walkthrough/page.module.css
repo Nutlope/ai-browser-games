@@ -1,72 +1,91 @@
 .page {
-  width: min(1480px, calc(100vw - 3rem));
+  width: min(1480px, calc(100vw - 2rem));
   margin: 0 auto;
-  padding: 3.5rem 0 6rem;
+  padding: 1rem 0 5rem;
   display: grid;
-  gap: 3rem;
+  gap: 1.25rem;
 }
 
 .hero {
   display: grid;
   gap: 1rem;
-  max-width: 52rem;
+  max-width: 62rem;
+  padding: 2rem 0;
+  border-bottom: 1px solid var(--border);
 }
 
-.eyebrow {
+.eyebrow,
+.cardEyebrow {
   margin: 0;
-  font-size: 0.75rem;
-  letter-spacing: 0.18em;
-  text-transform: uppercase;
-  color: var(--text-soft);
+  font-family: var(--font-display);
+  font-size: 0.78rem;
+  line-height: 1.2;
+  color: var(--accent-strong);
 }
 
 .title {
   margin: 0;
-  font-size: clamp(2.9rem, 8vw, 5.4rem);
+  font-family: var(--font-display);
+  font-size: clamp(3rem, 7vw, 6rem);
   line-height: 0.94;
-  font-weight: 400;
+  font-weight: 700;
+  letter-spacing: -0.05em;
 }
 
 .description {
   margin: 0;
-  font-size: 1.05rem;
+  font-size: 1rem;
   line-height: 1.65;
   color: var(--text-soft);
-  max-width: 42rem;
+  max-width: 62ch;
 }
 
 .actions {
   display: flex;
   flex-wrap: wrap;
-  gap: 0.75rem;
-  padding-top: 0.3rem;
+  gap: 0.5rem;
+  padding-top: 0.2rem;
 }
 
 .link {
-  padding: 0.65rem 1rem;
-  border-radius: 999px;
+  padding: 0.55rem 0.7rem;
   border: 1px solid var(--border);
-  background: rgba(255, 251, 244, 0.72);
-  font-size: 0.86rem;
+  border-radius: var(--radius-sm);
+  background: oklch(18% 0.018 150 / 0.72);
+  font-family: var(--font-display);
+  font-size: 0.78rem;
   color: var(--text-soft);
+  transition:
+    border-color 160ms var(--ease-out),
+    color 160ms var(--ease-out),
+    transform 160ms var(--ease-out);
+}
+
+.link:hover {
+  transform: translateY(-1px);
+  border-color: var(--accent);
+  color: var(--accent-strong);
 }
 
 .fullShotSection,
 .framesSection {
   display: grid;
-  gap: 1.5rem;
+  gap: 1rem;
+  padding-top: 1rem;
 }
 
 .sectionHeader {
   display: grid;
   gap: 0.55rem;
-  max-width: 42rem;
+  max-width: 48rem;
 }
 
 .sectionTitle {
   margin: 0;
-  font-size: clamp(1.8rem, 4vw, 2.8rem);
-  font-weight: 400;
+  font-family: var(--font-display);
+  font-size: clamp(1.7rem, 3.5vw, 2.8rem);
+  line-height: 1.05;
+  letter-spacing: -0.03em;
 }
 
 .sectionText {
@@ -78,11 +97,11 @@
 .fullShotFrame,
 .shotFrame {
   margin: 0;
-  border-radius: 2rem;
   overflow: hidden;
-  border: 1px solid rgba(36, 31, 24, 0.1);
-  background: rgba(255, 251, 244, 0.82);
-  box-shadow: 0 30px 70px rgba(51, 40, 24, 0.12);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  background: var(--surface);
+  box-shadow: var(--shadow-tight);
 }
 
 .fullShot {
@@ -93,17 +112,22 @@
 
 .framesGrid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
-  gap: 2rem;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 320px), 1fr));
+  gap: 1rem;
 }
 
 .card {
   display: grid;
-  gap: 1rem;
+  gap: 0.8rem;
+  padding: 0.8rem;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  background: var(--surface);
 }
 
 .shotFrame {
   aspect-ratio: 1.1 / 1;
+  box-shadow: none;
 }
 
 .croppedShot {
@@ -130,28 +154,15 @@
   gap: 0.45rem;
 }
 
-.cardEyebrow {
-  margin: 0;
-  font-size: 0.78rem;
-  letter-spacing: 0.16em;
-  text-transform: uppercase;
-  color: var(--text-soft);
-}
-
 .cardText {
   margin: 0;
   line-height: 1.6;
-  color: var(--text);
+  color: var(--text-soft);
 }
 
 @media (max-width: 640px) {
   .page {
     width: min(100vw - 1rem, 1480px);
-    padding: 1.5rem 0 3rem;
-    gap: 2rem;
-  }
-
-  .framesGrid {
-    gap: 1.5rem;
+    padding-bottom: 3rem;
   }
 }

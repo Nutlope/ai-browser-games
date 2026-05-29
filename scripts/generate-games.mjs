@@ -9,14 +9,28 @@ const rootDir = path.resolve(__dirname, "..");
 const outputDir = path.join(rootDir, "generated");
 const outputPath = path.join(outputDir, "games.json");
 const reportPath = path.join(outputDir, "together-report.json");
-const MAX_OUTPUT_TOKENS = 10000;
+const MAX_OUTPUT_TOKENS = 16000;
 
 const apiKey = process.env.TOGETHER_API_KEY;
 
 const models = [
   {
-    id: "MiniMaxAI/MiniMax-M2.5",
-    label: "MiniMax M2.5",
+    id: "deepseek-ai/DeepSeek-V4-Pro",
+    label: "DeepSeek V4 Pro",
+    provider: "Together",
+    inputPricePerMillion: 2.1,
+    outputPricePerMillion: 4.4,
+  },
+  {
+    id: "moonshotai/Kimi-K2.6",
+    label: "Kimi K2.6",
+    provider: "Together",
+    inputPricePerMillion: 1.2,
+    outputPricePerMillion: 4.5,
+  },
+  {
+    id: "MiniMaxAI/MiniMax-M2.7",
+    label: "MiniMax M2.7",
     provider: "Together",
     inputPricePerMillion: 0.3,
     outputPricePerMillion: 1.2,

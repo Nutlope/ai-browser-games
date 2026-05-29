@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import type { GameEntry } from "@/types/game";
 import styles from "./game-tile.module.css";
 
@@ -10,6 +10,9 @@ type GameTileProps = {
 
 export function GameTile({ entry }: GameTileProps) {
   const iframeRef = useRef<HTMLIFrameElement>(null);
+  const dialogRef = useRef<HTMLDialogElement>(null);
+  const modalIframeRef = useRef<HTMLIFrameElement>(null);
+  const [isOpen, setIsOpen] = useState(false);
   const metadata = [
     {
       label: "Model",
@@ -30,8 +33,71 @@ export function GameTile({ entry }: GameTileProps) {
   ];
 
   const focusFrame = () => {
-    iframeRef.current?.focus();
+    modalIframeRef.current?.focus();
   };
+
+  const openGame = () => {
+    const dialog = dialogRef.current;
+
+    if (!dialog) {
+      return;
+    }
+
+    setIsOpen(true);
+
+    if (!dialog.open) {
+      dialog.showModal();
+    }
+  };
+
+  const closeGame = () => {
+    dialogRef.current?.close();
+  };
+
+  useEffect(() => {
+    if (!isOpen) {
+      return;
+    }
+
+    const originalOverflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    window.setTimeout(() => modalIframeRef.current?.focus(), 60);
+
+    const preventPageScroll = (event: KeyboardEvent) => {
+      if (document.activeElement instanceof HTMLButtonElement) {
+        return;
+      }
+
+      if (["ArrowUp", "ArrowDown", "ArrowLeft", "ArrowRight", " "].includes(event.key)) {
+        event.preventDefault();
+      }
+    };
+
+    window.addEventListener("keydown", preventPageScroll, { capture: true });
+
+    return () => {
+      document.body.style.overflow = originalOverflow;
+      window.removeEventListener("keydown", preventPageScroll, { capture: true });
+    };
+  }, [isOpen]);
+
+  useEffect(() => {
+    const dialog = dialogRef.current;
+
+    if (!dialog) {
+      return;
+    }
+
+    const handleClose = () => {
+      setIsOpen(false);
+    };
+
+    dialog.addEventListener("close", handleClose);
+
+    return () => {
+      dialog.removeEventListener("close", handleClose);
+    };
+  }, []);
 
   return (
     <article className={styles.tile}>
@@ -42,8 +108,14 @@ export function GameTile({ entry }: GameTileProps) {
             {[entry.provider, entry.game].filter(Boolean).join(" · ")}
           </p>
         </div>
+        <span className={styles.status}>Ready</span>
       </header>
-      <div className={styles.frameWrap}>
+      <button
+        className={styles.frameWrap}
+        type="button"
+        onClick={openGame}
+        aria-label={`Play ${entry.label} ${entry.game}`}
+      >
         <iframe
           ref={iframeRef}
           className={styles.frame}
@@ -51,10 +123,12 @@ export function GameTile({ entry }: GameTileProps) {
           srcDoc={entry.html}
           sandbox="allow-scripts"
           loading="lazy"
-          tabIndex={0}
-          onPointerDown={focusFrame}
+          tabIndex={-1}
+          aria-hidden="true"
         />
-      </div>
+        <span className={styles.playButton}>Play game</span>
+      </button>
+      <p className={styles.hint}>Open the focused player to keep arrow keys inside the game.</p>
       <dl className={styles.metaGrid}>
         {metadata.map((item) => (
           <div key={item.label} className={styles.metaItem}>
@@ -63,6 +137,42 @@ export function GameTile({ entry }: GameTileProps) {
           </div>
         ))}
       </dl>
+      <dialog
+        ref={dialogRef}
+        className={styles.dialog}
+        aria-label={`${entry.label} ${entry.game} player`}
+        onClick={(event) => {
+          if (event.target === dialogRef.current) {
+            closeGame();
+          }
+        }}
+      >
+        <div className={styles.modalShell}>
+          <header className={styles.modalHeader}>
+            <div>
+              <span className={styles.modalEyebrow}>{entry.game}</span>
+              <h2 className={styles.modalTitle}>{entry.label}</h2>
+            </div>
+            <button className={styles.closeButton} type="button" onClick={closeGame}>
+              Close
+            </button>
+          </header>
+          <div className={styles.modalFrameWrap}>
+            {isOpen ? (
+              <iframe
+                ref={modalIframeRef}
+                className={styles.modalFrame}
+                title={`${entry.label} ${entry.game}`}
+                srcDoc={entry.html}
+                sandbox="allow-scripts"
+                tabIndex={0}
+                onPointerDown={focusFrame}
+              />
+            ) : null}
+          </div>
+          <p className={styles.modalHint}>Arrow keys are captured while this player is open. Press Escape to close.</p>
+        </div>
+      </dialog>
     </article>
   );
 }

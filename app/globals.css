@@ -1,13 +1,26 @@
+/* Hallmark · macrostructure: Workbench · theme: Terminal · audience: AI-game comparers · use: inspect playable model outputs · tone: technical-playful */
 :root {
-  --bg: #f5f2ea;
-  --bg-strong: #ece5d8;
-  --surface: rgba(255, 252, 245, 0.84);
-  --surface-strong: rgba(255, 252, 245, 0.96);
-  --border: rgba(36, 31, 24, 0.16);
-  --text: #1f1a15;
-  --text-soft: rgba(31, 26, 21, 0.68);
-  --shadow: 0 24px 50px rgba(54, 42, 26, 0.08);
-  --accent: #2f6a4f;
+  --bg: oklch(13% 0.014 150);
+  --bg-strong: oklch(17% 0.018 150);
+  --surface: oklch(19% 0.02 150);
+  --surface-strong: oklch(23% 0.022 150);
+  --surface-raised: oklch(27% 0.026 150);
+  --border: oklch(36% 0.032 150);
+  --border-strong: oklch(48% 0.05 150);
+  --text: oklch(92% 0.018 142);
+  --text-soft: oklch(71% 0.028 145);
+  --text-muted: oklch(56% 0.03 150);
+  --accent: oklch(78% 0.17 145);
+  --accent-strong: oklch(86% 0.18 145);
+  --danger: oklch(76% 0.13 35);
+  --shadow: 0 22px 56px oklch(7% 0.018 150 / 0.5);
+  --shadow-tight: 0 12px 26px oklch(6% 0.014 150 / 0.42);
+  --font-display: "JetBrains Mono", "SFMono-Regular", "Cascadia Code", "Liberation Mono", monospace;
+  --font-body: "IBM Plex Sans", "Aptos", "Segoe UI", sans-serif;
+  --radius-sm: 6px;
+  --radius-md: 8px;
+  --radius-lg: 12px;
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 * {
@@ -17,18 +30,21 @@
 html {
   min-height: 100%;
   background:
-    radial-gradient(circle at top left, rgba(255, 255, 255, 0.6), transparent 32%),
-    linear-gradient(180deg, #f6f1e8 0%, #efe8dc 100%);
+    linear-gradient(90deg, oklch(24% 0.022 150 / 0.22) 1px, transparent 1px),
+    linear-gradient(180deg, oklch(21% 0.018 150 / 0.18) 1px, transparent 1px),
+    linear-gradient(180deg, var(--bg) 0%, oklch(10% 0.014 150) 100%);
+  background-size: 72px 72px, 72px 72px, auto;
 }
 
 body {
   margin: 0;
   min-height: 100vh;
   color: var(--text);
-  font-family: Georgia, "Times New Roman", serif;
+  font-family: var(--font-body);
   background:
-    radial-gradient(circle at top right, rgba(255, 255, 255, 0.6), transparent 28%),
-    linear-gradient(180deg, rgba(245, 242, 234, 0.3), rgba(245, 242, 234, 0.86));
+    linear-gradient(180deg, oklch(20% 0.03 150 / 0.62), transparent 19rem),
+    linear-gradient(90deg, oklch(10% 0.018 150 / 0.55), transparent 24%, transparent 76%, oklch(10% 0.018 150 / 0.55));
+  text-rendering: geometricPrecision;
 }
 
 a {
@@ -44,5 +60,11 @@ select {
 }
 
 ::selection {
-  background: rgba(47, 106, 79, 0.18);
+  color: var(--bg);
+  background: var(--accent);
+}
+
+:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 3px;
 }
