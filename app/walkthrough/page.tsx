@@ -9,7 +9,7 @@ const frames = [
   },
   {
     title: "Play In Place",
-    text: "Click into a snake or flappy iframe and play right there without leaving the gallery view.",
+    text: "Click into any game iframe and play right there without leaving the gallery view.",
     className: "play"
   },
   {
@@ -37,8 +37,8 @@ export default function WalkthroughPage() {
           <Link href="/snake" className={styles.link}>
             Open snake page
           </Link>
-          <Link href="/flappy" className={styles.link}>
-            Open flappy page
+          <Link href="/tetris-lite" className={styles.link}>
+            Open Tetris-lite page
           </Link>
         </div>
       </header>

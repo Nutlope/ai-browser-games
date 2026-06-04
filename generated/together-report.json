@@ -1,104 +1,181 @@
 {
   "provider": "Together",
-  "generatedAt": "2026-05-01T17:20:39.115Z",
-  "successCount": 12,
+  "generatedAt": "2026-06-04T21:21:02.201Z",
+  "successCount": 23,
   "failureCount": 2,
   "successes": [
     {
+      "model": "deepseek-ai/DeepSeek-V4-Pro",
+      "game": "Snake",
+      "outputTokens": 3471,
+      "totalTokens": 3615,
+      "costUsd": 0.015575
+    },
+    {
       "model": "moonshotai/Kimi-K2.6",
       "game": "Snake",
-      "outputTokens": 5371,
-      "totalTokens": 5519,
-      "costUsd": 0.024347
+      "outputTokens": 3291,
+      "totalTokens": 3439,
+      "costUsd": 0.014987
     },
     {
       "model": "MiniMaxAI/MiniMax-M2.7",
       "game": "Snake",
-      "outputTokens": 4419,
-      "totalTokens": 4571,
-      "costUsd": 0.005348
-    },
-    {
-      "model": "moonshotai/Kimi-K2.5",
-      "game": "Snake",
-      "outputTokens": 3827,
-      "totalTokens": 3975,
-      "costUsd": 0.01079
+      "outputTokens": 3779,
+      "totalTokens": 3931,
+      "costUsd": 0.00458
     },
     {
       "model": "zai-org/GLM-5.1",
       "game": "Snake",
-      "outputTokens": 1835,
-      "totalTokens": 1976,
-      "costUsd": 0.008271
+      "outputTokens": 2222,
+      "totalTokens": 2363,
+      "costUsd": 0.009974
     },
     {
       "model": "openai/gpt-oss-120b",
       "game": "Snake",
-      "outputTokens": 1777,
-      "totalTokens": 1987,
-      "costUsd": 0.001098
+      "outputTokens": 1417,
+      "totalTokens": 1627,
+      "costUsd": 0.000882
     },
     {
-      "model": "google/gemma-4-31B-it",
-      "game": "Snake",
-      "outputTokens": 2263,
-      "totalTokens": 2440,
-      "costUsd": 0.001167
+      "model": "deepseek-ai/DeepSeek-V4-Pro",
+      "game": "Tetris-lite",
+      "outputTokens": 3907,
+      "totalTokens": 4061,
+      "costUsd": 0.017514
     },
     {
       "model": "moonshotai/Kimi-K2.6",
-      "game": "Flappy",
-      "outputTokens": 4305,
-      "totalTokens": 4448,
-      "costUsd": 0.019544
+      "game": "Tetris-lite",
+      "outputTokens": 5266,
+      "totalTokens": 5425,
+      "costUsd": 0.023888
     },
     {
       "model": "MiniMaxAI/MiniMax-M2.7",
-      "game": "Flappy",
-      "outputTokens": 1500,
-      "totalTokens": 1647,
-      "costUsd": 0.001844
-    },
-    {
-      "model": "moonshotai/Kimi-K2.5",
-      "game": "Flappy",
-      "outputTokens": 3085,
-      "totalTokens": 3228,
-      "costUsd": 0.00871
-    },
-    {
-      "model": "zai-org/GLM-5.1",
-      "game": "Flappy",
-      "outputTokens": 2144,
-      "totalTokens": 2280,
-      "costUsd": 0.009624
+      "game": "Tetris-lite",
+      "outputTokens": 5681,
+      "totalTokens": 5845,
+      "costUsd": 0.006866
     },
     {
       "model": "openai/gpt-oss-120b",
-      "game": "Flappy",
-      "outputTokens": 1712,
-      "totalTokens": 1917,
-      "costUsd": 0.001058
+      "game": "Tetris-lite",
+      "outputTokens": 1618,
+      "totalTokens": 1839,
+      "costUsd": 0.001004
     },
     {
-      "model": "google/gemma-4-31B-it",
-      "game": "Flappy",
-      "outputTokens": 2497,
-      "totalTokens": 2669,
-      "costUsd": 0.001283
+      "model": "deepseek-ai/DeepSeek-V4-Pro",
+      "game": "Breakout",
+      "outputTokens": 4440,
+      "totalTokens": 4579,
+      "costUsd": 0.019828
+    },
+    {
+      "model": "moonshotai/Kimi-K2.6",
+      "game": "Breakout",
+      "outputTokens": 4308,
+      "totalTokens": 4453,
+      "costUsd": 0.01956
+    },
+    {
+      "model": "MiniMaxAI/MiniMax-M2.7",
+      "game": "Breakout",
+      "outputTokens": 4402,
+      "totalTokens": 4551,
+      "costUsd": 0.005327
+    },
+    {
+      "model": "zai-org/GLM-5.1",
+      "game": "Breakout",
+      "outputTokens": 5502,
+      "totalTokens": 5640,
+      "costUsd": 0.024402
+    },
+    {
+      "model": "openai/gpt-oss-120b",
+      "game": "Breakout",
+      "outputTokens": 1672,
+      "totalTokens": 1879,
+      "costUsd": 0.001034
+    },
+    {
+      "model": "deepseek-ai/DeepSeek-V4-Pro",
+      "game": "Sokoban",
+      "outputTokens": 3498,
+      "totalTokens": 3645,
+      "costUsd": 0.0157
+    },
+    {
+      "model": "moonshotai/Kimi-K2.6",
+      "game": "Sokoban",
+      "outputTokens": 4669,
+      "totalTokens": 4822,
+      "costUsd": 0.021194
+    },
+    {
+      "model": "MiniMaxAI/MiniMax-M2.7",
+      "game": "Sokoban",
+      "outputTokens": 4225,
+      "totalTokens": 4382,
+      "costUsd": 0.005117
+    },
+    {
+      "model": "openai/gpt-oss-120b",
+      "game": "Sokoban",
+      "outputTokens": 1997,
+      "totalTokens": 2211,
+      "costUsd": 0.00123
+    },
+    {
+      "model": "deepseek-ai/DeepSeek-V4-Pro",
+      "game": "Pong",
+      "outputTokens": 3856,
+      "totalTokens": 3997,
+      "costUsd": 0.017263
+    },
+    {
+      "model": "moonshotai/Kimi-K2.6",
+      "game": "Pong",
+      "outputTokens": 4025,
+      "totalTokens": 4172,
+      "costUsd": 0.018289
+    },
+    {
+      "model": "MiniMaxAI/MiniMax-M2.7",
+      "game": "Pong",
+      "outputTokens": 4059,
+      "totalTokens": 4209,
+      "costUsd": 0.004916
+    },
+    {
+      "model": "zai-org/GLM-5.1",
+      "game": "Pong",
+      "outputTokens": 2039,
+      "totalTokens": 2179,
+      "costUsd": 0.009168
+    },
+    {
+      "model": "openai/gpt-oss-120b",
+      "game": "Pong",
+      "outputTokens": 1436,
+      "totalTokens": 1644,
+      "costUsd": 0.000893
     }
   ],
   "failures": [
     {
-      "model": "deepseek-ai/DeepSeek-V4-Pro",
-      "game": "Snake",
-      "error": "Model returned incomplete HTML. The response also hit the max token limit, so it was likely truncated."
+      "model": "zai-org/GLM-5.1",
+      "game": "Tetris-lite",
+      "error": "The operation was aborted due to timeout"
     },
     {
-      "model": "deepseek-ai/DeepSeek-V4-Pro",
-      "game": "Flappy",
-      "error": "Model returned incomplete HTML. The response also hit the max token limit, so it was likely truncated."
+      "model": "zai-org/GLM-5.1",
+      "game": "Sokoban",
+      "error": "The operation was aborted due to timeout"
     }
   ]
 }

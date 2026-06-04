@@ -1,25 +1,41 @@
-/* Hallmark · macrostructure: Workbench · theme: Terminal · audience: AI-game comparers · use: inspect playable model outputs · tone: technical-playful */
+/* Hallmark · pre-emit critique: P5 H5 E4 S5 R4 V5 */
+/* Hallmark · macrostructure: Stat-Led Workbench · theme: Hum · audience: AI-game comparers · use: compare playable outputs by tokens and cost · tone: playful-exact */
 :root {
-  --bg: oklch(13% 0.014 150);
-  --bg-strong: oklch(17% 0.018 150);
-  --surface: oklch(19% 0.02 150);
-  --surface-strong: oklch(23% 0.022 150);
-  --surface-raised: oklch(27% 0.026 150);
-  --border: oklch(36% 0.032 150);
-  --border-strong: oklch(48% 0.05 150);
-  --text: oklch(92% 0.018 142);
-  --text-soft: oklch(71% 0.028 145);
-  --text-muted: oklch(56% 0.03 150);
-  --accent: oklch(78% 0.17 145);
-  --accent-strong: oklch(86% 0.18 145);
-  --danger: oklch(76% 0.13 35);
-  --shadow: 0 22px 56px oklch(7% 0.018 150 / 0.5);
-  --shadow-tight: 0 12px 26px oklch(6% 0.014 150 / 0.42);
-  --font-display: "JetBrains Mono", "SFMono-Regular", "Cascadia Code", "Liberation Mono", monospace;
-  --font-body: "IBM Plex Sans", "Aptos", "Segoe UI", sans-serif;
-  --radius-sm: 6px;
-  --radius-md: 8px;
-  --radius-lg: 12px;
+  --bg: oklch(97% 0.012 95);
+  --bg-strong: oklch(94% 0.016 95);
+  --surface: oklch(99% 0.006 95);
+  --surface-strong: oklch(91% 0.02 95);
+  --surface-raised: oklch(100% 0 0);
+  --surface-tint: oklch(86% 0.18 95 / 0.34);
+  --border: oklch(76% 0.035 82);
+  --border-strong: oklch(55% 0.052 78);
+  --text: oklch(20% 0.012 250);
+  --text-soft: oklch(39% 0.026 250);
+  --text-muted: oklch(56% 0.035 250);
+  --accent: oklch(86% 0.18 95);
+  --accent-strong: oklch(49% 0.13 95);
+  --accent-deep: oklch(69% 0.17 92);
+  --accent-cool: oklch(66% 0.18 235);
+  --accent-cool-soft: oklch(91% 0.055 220);
+  --accent-warm: oklch(68% 0.24 18);
+  --accent-warm-soft: oklch(94% 0.055 25);
+  --accent-mint: oklch(80% 0.16 150);
+  --accent-lavender: oklch(74% 0.16 305);
+  --danger: var(--accent-warm);
+  --grid-line: oklch(72% 0.036 95 / 0.42);
+  --shadow: 0 30px 70px -32px oklch(20% 0.012 250 / 0.36);
+  --shadow-tight: 0 18px 36px -24px oklch(20% 0.012 250 / 0.28);
+  --font-display: "Plus Jakarta Sans", "Arial Rounded MT Bold", "Aptos", system-ui, sans-serif;
+  --font-body: "Plus Jakarta Sans", "Aptos", system-ui, sans-serif;
+  --font-mono: "JetBrains Mono", "SFMono-Regular", "Cascadia Code", monospace;
+  --radius-sm: 12px;
+  --radius-md: 16px;
+  --radius-lg: 20px;
+  --radius-pill: 999px;
+  --btn-edge: var(--accent-deep);
+  --btn-cast: oklch(76% 0.2 95 / 0.45);
+  --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+  --ease-snap: cubic-bezier(0.22, 1, 0.36, 1);
   --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
 }
 
@@ -29,21 +45,24 @@
 
 html {
   min-height: 100%;
+  overflow-x: clip;
   background:
-    linear-gradient(90deg, oklch(24% 0.022 150 / 0.22) 1px, transparent 1px),
-    linear-gradient(180deg, oklch(21% 0.018 150 / 0.18) 1px, transparent 1px),
-    linear-gradient(180deg, var(--bg) 0%, oklch(10% 0.014 150) 100%);
-  background-size: 72px 72px, 72px 72px, auto;
+    linear-gradient(90deg, var(--grid-line) 1px, transparent 1px),
+    linear-gradient(180deg, var(--grid-line) 1px, transparent 1px),
+    radial-gradient(circle at 88% 6%, var(--accent-cool-soft), transparent 24rem),
+    radial-gradient(circle at 8% 18%, var(--surface-tint), transparent 22rem),
+    var(--bg);
+  background-size: 72px 72px, 72px 72px, auto, auto, auto;
 }
 
 body {
   margin: 0;
   min-height: 100vh;
+  overflow-x: clip;
   color: var(--text);
   font-family: var(--font-body);
   background:
-    linear-gradient(180deg, oklch(20% 0.03 150 / 0.62), transparent 19rem),
-    linear-gradient(90deg, oklch(10% 0.018 150 / 0.55), transparent 24%, transparent 76%, oklch(10% 0.018 150 / 0.55));
+    linear-gradient(180deg, oklch(100% 0 0 / 0.32), transparent 18rem);
   text-rendering: geometricPrecision;
 }
 
@@ -65,6 +84,17 @@ select {
 }
 
 :focus-visible {
-  outline: 2px solid var(--accent);
+  outline: 3px solid var(--accent-cool);
   outline-offset: 3px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 1ms !important;
+    animation-iteration-count: 1 !important;
+    scroll-behavior: auto !important;
+    transition-duration: 1ms !important;
+  }
 }

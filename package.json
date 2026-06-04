@@ -7,8 +7,8 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "generate:games": "node scripts/generate-games.mjs",
-    "generate:games:openrouter": "node scripts/generate-openrouter-games.mjs"
+    "generate:games-together": "node scripts/generate-games.mjs",
+    "generate:games-other": "node scripts/generate-openrouter-games.mjs"
   },
   "dependencies": {
     "next": "16.2.6",

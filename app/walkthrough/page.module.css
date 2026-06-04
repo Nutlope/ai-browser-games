@@ -29,7 +29,8 @@
   font-size: clamp(3rem, 7vw, 6rem);
   line-height: 0.94;
   font-weight: 700;
-  letter-spacing: -0.05em;
+  letter-spacing: 0;
+  overflow-wrap: anywhere;
 }
 
 .description {
@@ -51,7 +52,7 @@
   padding: 0.55rem 0.7rem;
   border: 1px solid var(--border);
   border-radius: var(--radius-sm);
-  background: oklch(18% 0.018 150 / 0.72);
+  background: var(--surface);
   font-family: var(--font-display);
   font-size: 0.78rem;
   color: var(--text-soft);
@@ -85,7 +86,7 @@
   font-family: var(--font-display);
   font-size: clamp(1.7rem, 3.5vw, 2.8rem);
   line-height: 1.05;
-  letter-spacing: -0.03em;
+  letter-spacing: 0;
 }
 
 .sectionText {

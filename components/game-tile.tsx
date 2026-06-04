@@ -100,7 +100,7 @@ export function GameTile({ entry }: GameTileProps) {
   }, []);
 
   return (
-    <article className={styles.tile}>
+    <article className={styles.tile} id={entry.id}>
       <header className={styles.header}>
         <div>
           <span className={styles.label}>{entry.label}</span>
@@ -108,7 +108,9 @@ export function GameTile({ entry }: GameTileProps) {
             {[entry.provider, entry.game].filter(Boolean).join(" · ")}
           </p>
         </div>
-        <span className={styles.status}>Ready</span>
+        <span className={styles.status}>
+          {entry.generationCostUsd != null ? `$${entry.generationCostUsd.toFixed(4)}` : "Ready"}
+        </span>
       </header>
       <button
         className={styles.frameWrap}
@@ -128,7 +130,7 @@ export function GameTile({ entry }: GameTileProps) {
         />
         <span className={styles.playButton}>Play game</span>
       </button>
-      <p className={styles.hint}>Open the focused player to keep arrow keys inside the game.</p>
+      <p className={styles.hint}>Play it first, then compare the cost and token receipt below.</p>
       <dl className={styles.metaGrid}>
         {metadata.map((item) => (
           <div key={item.label} className={styles.metaItem}>
@@ -153,6 +155,16 @@ export function GameTile({ entry }: GameTileProps) {
               <span className={styles.modalEyebrow}>{entry.game}</span>
               <h2 className={styles.modalTitle}>{entry.label}</h2>
             </div>
+            <dl className={styles.modalStats}>
+              <div>
+                <dt>Tokens</dt>
+                <dd>{entry.totalTokens?.toLocaleString() ?? "TBD"}</dd>
+              </div>
+              <div>
+                <dt>Cost</dt>
+                <dd>{entry.generationCostUsd != null ? `$${entry.generationCostUsd.toFixed(4)}` : "TBD"}</dd>
+              </div>
+            </dl>
             <button className={styles.closeButton} type="button" onClick={closeGame}>
               Close
             </button>

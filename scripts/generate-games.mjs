@@ -1,4 +1,4 @@
-import { mkdir, readFile, writeFile } from "node:fs/promises";
+import { mkdir, writeFile } from "node:fs/promises";
 import path from "node:path";
 import process from "node:process";
 import { fileURLToPath } from "node:url";
@@ -10,6 +10,7 @@ const outputDir = path.join(rootDir, "generated");
 const outputPath = path.join(outputDir, "games.json");
 const reportPath = path.join(outputDir, "together-report.json");
 const MAX_OUTPUT_TOKENS = 16000;
+const REQUEST_TIMEOUT_MS = 300000;
 
 const apiKey = process.env.TOGETHER_API_KEY;
 
@@ -36,13 +37,6 @@ const models = [
     outputPricePerMillion: 1.2,
   },
   {
-    id: "moonshotai/Kimi-K2.5",
-    label: "Kimi K2.5",
-    provider: "Together",
-    inputPricePerMillion: 0.5,
-    outputPricePerMillion: 2.8,
-  },
-  {
     id: "zai-org/GLM-5.1",
     label: "GLM 5.1",
     provider: "Together",
@@ -55,13 +49,6 @@ const models = [
     provider: "Together",
     inputPricePerMillion: 0.15,
     outputPricePerMillion: 0.6,
-  },
-  {
-    id: "google/gemma-4-31B-it",
-    label: "Gemma 4 31B",
-    provider: "Together",
-    inputPricePerMillion: 0.2,
-    outputPricePerMillion: 0.5,
   },
 ];
 
@@ -86,55 +73,70 @@ const gamePrompts = [
     ].join("\n"),
   },
   {
-    key: "flappyEntries",
-    game: "Flappy",
-    slug: "flappy",
+    key: "tetrisLiteEntries",
+    game: "Tetris-lite",
+    slug: "tetris-lite",
     prompt: [
-      "Build a polished browser flappy-bird-style game as a single self-contained HTML document.",
+      "Build a polished browser Tetris-lite falling-block game as a single self-contained HTML document.",
       "Requirements:",
       "- Return only HTML, with inline CSS and JavaScript. No markdown fences.",
       "- The game must fit cleanly inside a square 480x480 iframe.",
-      "- Make the game playable with click/tap and spacebar.",
-      "- Include score, restart handling, and clear visual feedback.",
+      "- Support keyboard controls for moving, rotating, soft drop, and hard drop.",
+      "- Include falling tetromino-like pieces, collision handling, line clears, scoring, restart handling, and clear visual feedback.",
+      "- Keep the design tasteful and minimal.",
+      "- Keep the implementation compact and avoid unnecessary code or commentary.",
+      "- Do not depend on any external assets, fonts, libraries, or network requests.",
+    ].join("\n"),
+  },
+  {
+    key: "breakoutEntries",
+    game: "Breakout",
+    slug: "breakout",
+    prompt: [
+      "Build a polished browser Breakout game as a single self-contained HTML document.",
+      "Requirements:",
+      "- Return only HTML, with inline CSS and JavaScript. No markdown fences.",
+      "- The game must fit cleanly inside a square 480x480 iframe.",
+      "- Support keyboard and pointer controls for the paddle.",
+      "- Include ball physics, brick collision, score, lives or restart handling, and clear visual feedback.",
+      "- Keep the design tasteful and minimal.",
+      "- Keep the implementation compact and avoid unnecessary code or commentary.",
+      "- Do not depend on any external assets, fonts, libraries, or network requests.",
+    ].join("\n"),
+  },
+  {
+    key: "sokobanEntries",
+    game: "Sokoban",
+    slug: "sokoban",
+    prompt: [
+      "Build a polished browser Sokoban puzzle game as a single self-contained HTML document.",
+      "Requirements:",
+      "- Return only HTML, with inline CSS and JavaScript. No markdown fences.",
+      "- The game must fit cleanly inside a square 480x480 iframe.",
+      "- Support arrow keys and WASD.",
+      "- Include walls, boxes, targets, valid push rules, move count, restart handling, win feedback, and at least one compact level.",
+      "- Keep the design tasteful and minimal.",
+      "- Keep the implementation compact and avoid unnecessary code or commentary.",
+      "- Do not depend on any external assets, fonts, libraries, or network requests.",
+    ].join("\n"),
+  },
+  {
+    key: "pongEntries",
+    game: "Pong",
+    slug: "pong",
+    prompt: [
+      "Build a polished browser Pong game as a single self-contained HTML document.",
+      "Requirements:",
+      "- Return only HTML, with inline CSS and JavaScript. No markdown fences.",
+      "- The game must fit cleanly inside a square 480x480 iframe.",
+      "- Support keyboard and pointer controls for the player paddle.",
+      "- Include ball movement, paddle collision, opponent behavior, scoring, restart handling, and clear visual feedback.",
       "- Keep the design tasteful and minimal.",
       "- Keep the implementation compact and avoid unnecessary code or commentary.",
       "- Do not depend on any external assets, fonts, libraries, or network requests.",
     ].join("\n"),
   },
 ];
-
-async function loadExistingOutput() {
-  try {
-    const file = await readFile(outputPath, "utf8");
-    const parsed = JSON.parse(file);
-
-    return {
-      snakeEntries: Array.isArray(parsed.snakeEntries)
-        ? parsed.snakeEntries
-        : [],
-      flappyEntries: Array.isArray(parsed.flappyEntries)
-        ? parsed.flappyEntries
-        : [],
-    };
-  } catch {
-    return {
-      snakeEntries: [],
-      flappyEntries: [],
-    };
-  }
-}
-
-function mergeEntries(existingEntries, nextEntries) {
-  const byId = new Map(existingEntries.map((entry) => [entry.id, entry]));
-
-  for (const entry of nextEntries) {
-    byId.set(entry.id, entry);
-  }
-
-  return Array.from(byId.values()).sort((left, right) =>
-    left.label.localeCompare(right.label),
-  );
-}
 
 function slugify(value) {
   return value
@@ -209,6 +211,7 @@ function computeCostUsd(usage, model) {
 async function createGame(model, gamePrompt) {
   const response = await fetch("https://api.together.xyz/v1/chat/completions", {
     method: "POST",
+    signal: AbortSignal.timeout(REQUEST_TIMEOUT_MS),
     headers: {
       Authorization: `Bearer ${apiKey}`,
       "Content-Type": "application/json",
@@ -292,10 +295,9 @@ async function main() {
     process.exit(1);
   }
 
-  const output = {
-    snakeEntries: [],
-    flappyEntries: [],
-  };
+  const output = Object.fromEntries(
+    gamePrompts.map((gamePrompt) => [gamePrompt.key, []]),
+  );
   const failures = [];
   const successes = [];
   let successCount = 0;
@@ -364,13 +366,16 @@ async function main() {
     );
   }
 
-  const existing = await loadExistingOutput();
-  const merged = {
-    snakeEntries: mergeEntries(existing.snakeEntries, output.snakeEntries),
-    flappyEntries: mergeEntries(existing.flappyEntries, output.flappyEntries),
-  };
+  const nextOutput = Object.fromEntries(
+    gamePrompts.map((gamePrompt) => [
+      gamePrompt.key,
+      output[gamePrompt.key].sort((left, right) =>
+        left.label.localeCompare(right.label),
+      ),
+    ]),
+  );
 
-  await writeFile(outputPath, JSON.stringify(merged, null, 2) + "\n", "utf8");
+  await writeFile(outputPath, JSON.stringify(nextOutput, null, 2) + "\n", "utf8");
 
   process.stdout.write(`Wrote ${outputPath}\n`);
 

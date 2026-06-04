@@ -1,88 +1,165 @@
 import Link from "next/link";
-import { flappyEntries, snakeEntries } from "@/lib/games";
+import { allEntries, entriesByGame, gameDefinitions } from "@/lib/games";
 import styles from "./page.module.css";
 
-const gameLinks = [
-  {
-    href: "/snake",
-    name: "Snake",
-    status: `${snakeEntries.length} model ${snakeEntries.length === 1 ? "run" : "runs"}`,
-    text: "Movement, collision logic, scoring, and keyboard feel."
-  },
-  {
-    href: "/flappy",
-    name: "Flappy Bird",
-    status: `${flappyEntries.length} model ${flappyEntries.length === 1 ? "run" : "runs"}`,
-    text: "Timing, physics, obstacle generation, and polish."
-  }
-];
-
-const comingSoon = ["Tetris"];
-
 export default function HomePage() {
-  const gameCount = snakeEntries.length + flappyEntries.length;
-  const modelCount = new Set([...snakeEntries, ...flappyEntries].map((entry) => entry.model)).size;
+  const gameCount = allEntries.length;
+  const modelCount = new Set(allEntries.map((entry) => entry.model)).size;
+  const totalTokens = allEntries.reduce((sum, entry) => sum + (entry.totalTokens ?? 0), 0);
+  const totalCost = allEntries.reduce((sum, entry) => sum + (entry.generationCostUsd ?? 0), 0);
+  const pricedEntries = allEntries.filter((entry) => entry.generationCostUsd != null);
+  const cheapestEntry = [...pricedEntries].sort(
+    (a, b) => (a.generationCostUsd ?? Number.POSITIVE_INFINITY) - (b.generationCostUsd ?? Number.POSITIVE_INFINITY)
+  )[0];
+  const biggestEntry = [...allEntries].sort((a, b) => (b.totalTokens ?? 0) - (a.totalTokens ?? 0))[0];
+  const tableEntries = [...allEntries]
+    .sort((a, b) => (b.totalTokens ?? 0) - (a.totalTokens ?? 0))
+    .slice(0, 6);
+  const getEntryHref = (gameName: string) => {
+    const definition = gameDefinitions.find((game) => game.name === gameName || game.title === gameName);
+
+    return definition ? `/${definition.slug}` : "/";
+  };
 
   return (
     <main className={styles.page}>
       <header className={styles.masthead}>
         <div className={styles.brand}>
-          <span className={styles.dot} /> AI Game Bench
+          <span className={styles.dot} /> Bubble Bench
         </div>
         <nav className={styles.mastheadActions} aria-label="Primary">
-          <Link href="/snake" className={styles.mastheadLink}>Snake</Link>
-          <Link href="/flappy" className={styles.mastheadLink}>Flappy</Link>
+          <Link href="#model-ledger" className={styles.mastheadLink}>
+            Price table
+          </Link>
+          {gameDefinitions.map((game) => (
+            <Link key={game.slug} href={`/${game.slug}`} className={styles.mastheadLink}>
+              {game.name}
+            </Link>
+          ))}
         </nav>
       </header>
 
       <section className={styles.hero}>
         <div className={styles.heroCopy}>
-          <p className={styles.kicker}>Playable model evaluation</p>
-          <h1 className={styles.title}>Benchmark AI with playable games.</h1>
+          <p className={styles.kicker}>Playable games, priced honestly.</p>
+          <h1 className={styles.title}>See what each model spent to make the game.</h1>
           <p className={styles.description}>
-            Play model-generated Snake and Flappy Bird outputs, then compare the details that
-            reveal quality: controls, rules, timing, polish, tokens, and cost.
+            Every tile is playable. Every run carries its token count and build cost, so the
+            comparison is about more than which game feels best.
           </p>
           <div className={styles.actions}>
-            <Link href="/snake" className={styles.primaryAction}>Try Snake</Link>
-            <Link href="/flappy" className={styles.secondaryAction}>Try Flappy Bird</Link>
+            <Link href="/snake" className={styles.primaryAction}>
+              Play Snake runs
+              <span aria-hidden="true">→</span>
+            </Link>
+            <Link href="#model-ledger" className={styles.secondaryAction}>
+              Compare tokens
+            </Link>
           </div>
         </div>
 
-        <aside className={styles.preview} aria-label="App preview">
-          <div className={styles.previewTopbar}>
-            <span />
-            <span />
-            <span />
-            <strong>comparison run</strong>
+        <aside className={styles.heroBoard} aria-label="Benchmark totals">
+          <span className={styles.bubbleMascot} aria-hidden="true" />
+          <div className={styles.heroMetric}>
+            <span>Total spend</span>
+            <strong>{totalCost ? `$${totalCost.toFixed(3)}` : "TBD"}</strong>
+            <p>Across generated playable outputs.</p>
           </div>
-          <div className={styles.previewScreen}>
-            <div className={styles.gameBoard} aria-hidden="true">
-              <span className={styles.food} />
-              <span className={styles.snakeA} />
-              <span className={styles.snakeB} />
-              <span className={styles.snakeC} />
-            </div>
-            <div className={styles.previewPanel}>
-              <span>GPT 5.4</span>
-              <strong>Snake</strong>
-              <dl>
-                <div>
-                  <dt>Score</dt>
-                  <dd>18</dd>
-                </div>
-                <div>
-                  <dt>Tokens</dt>
-                  <dd>2,298</dd>
-                </div>
-                <div>
-                  <dt>Cost</dt>
-                  <dd>$0.023</dd>
-                </div>
-              </dl>
-            </div>
+          <div className={styles.heroMetric}>
+            <span>Total tokens</span>
+            <strong>{totalTokens ? totalTokens.toLocaleString() : "TBD"}</strong>
+            <p>Input and output tokens combined.</p>
+          </div>
+          <div className={styles.heroAside}>
+            <span>Cheapest build</span>
+            <strong>{cheapestEntry ? cheapestEntry.label : "TBD"}</strong>
+            <p>{cheapestEntry?.generationCostUsd != null ? `$${cheapestEntry.generationCostUsd.toFixed(4)}` : "No price yet"}</p>
+          </div>
+          <div className={styles.heroAside}>
+            <span>Most tokens</span>
+            <strong>{biggestEntry ? biggestEntry.label : "TBD"}</strong>
+            <p>{biggestEntry?.totalTokens ? biggestEntry.totalTokens.toLocaleString() : "No token count yet"}</p>
           </div>
         </aside>
+      </section>
+
+      <section className={styles.ledgerSection} id="model-ledger" aria-label="Model price and token ledger">
+        <div className={styles.sectionHeader}>
+          <p className={styles.kicker}>Model ledger</p>
+          <h2 className={styles.sectionTitle}>Token-heavy and cost-light runs, side by side.</h2>
+        </div>
+        <div className={styles.ledgerWrap}>
+          <table className={styles.ledgerTable}>
+            <thead>
+              <tr>
+                <th>Run</th>
+                <th>Game</th>
+                <th>Model</th>
+                <th>Tokens</th>
+                <th>Build cost</th>
+                <th>Play</th>
+              </tr>
+            </thead>
+            <tbody>
+              {tableEntries.map((entry) => (
+                <tr key={entry.id}>
+                  <td>{entry.label}</td>
+                  <td>{entry.game}</td>
+                  <td>{entry.model}</td>
+                  <td>{entry.totalTokens?.toLocaleString() ?? "TBD"}</td>
+                  <td>{entry.generationCostUsd != null ? `$${entry.generationCostUsd.toFixed(4)}` : "TBD"}</td>
+                  <td>
+                    <Link href={getEntryHref(entry.game)} className={styles.tableLink}>
+                      Open
+                    </Link>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+          {tableEntries.length === 0 ? (
+            <p className={styles.emptyLedger}>Generate a game run to populate the price table.</p>
+          ) : null}
+        </div>
+      </section>
+
+      <section className={styles.games} aria-label="Choose a game">
+        <div className={styles.sectionHeader}>
+          <p className={styles.kicker}>Play the benchmarks</p>
+          <h2 className={styles.sectionTitle}>Pick a game, then judge cost against feel.</h2>
+        </div>
+        <div className={styles.gameGrid}>
+          {gameDefinitions.map((game, index) => {
+            const entries = entriesByGame[game.slug];
+            const gameTokens = entries.reduce((sum, entry) => sum + (entry.totalTokens ?? 0), 0);
+            const gameCost = entries.reduce((sum, entry) => sum + (entry.generationCostUsd ?? 0), 0);
+
+            return (
+              <Link
+                key={game.slug}
+                href={`/${game.slug}`}
+                className={styles.gameCard}
+                data-accent={index % 4}
+              >
+                <span className={styles.gameStatus}>
+                  {entries.length ? `${entries.length} playable runs` : "Waiting for runs"}
+                </span>
+                <strong>{game.name}</strong>
+                <p>{game.cardText}</p>
+                <dl>
+                  <div>
+                    <dt>Tokens</dt>
+                    <dd>{gameTokens ? gameTokens.toLocaleString() : "TBD"}</dd>
+                  </div>
+                  <div>
+                    <dt>Cost</dt>
+                    <dd>{gameCost ? `$${gameCost.toFixed(3)}` : "TBD"}</dd>
+                  </div>
+                </dl>
+              </Link>
+            );
+          })}
+        </div>
       </section>
 
       <section className={styles.metrics} aria-label="Current benchmark size">
@@ -96,30 +173,7 @@ export default function HomePage() {
         </div>
         <div>
           <span>Game prompts</span>
-          <strong>2</strong>
-        </div>
-      </section>
-
-      <section className={styles.games} aria-label="Choose a game">
-        <div className={styles.sectionHeader}>
-          <p className={styles.kicker}>Choose a benchmark</p>
-          <h2 className={styles.sectionTitle}>Pick a game and compare the model outputs.</h2>
-        </div>
-        <div className={styles.gameGrid}>
-          {gameLinks.map((game) => (
-            <Link key={game.href} href={game.href} className={styles.gameCard}>
-              <span className={styles.gameStatus}>{game.status}</span>
-              <strong>{game.name}</strong>
-              <p>{game.text}</p>
-            </Link>
-          ))}
-          {comingSoon.map((name) => (
-            <div key={name} className={styles.disabledCard} aria-disabled="true">
-              <span className={styles.gameStatus}>Coming soon</span>
-              <strong>{name}</strong>
-              <p>Reserved for future prompts and model comparisons.</p>
-            </div>
-          ))}
+          <strong>{gameDefinitions.length}</strong>
         </div>
       </section>
     </main>
