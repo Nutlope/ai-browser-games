@@ -7,9 +7,9 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 const rootDir = path.resolve(__dirname, "..");
 const outputDir = path.join(rootDir, "generated");
-const outputPath = path.join(outputDir, "games.json");
+const outputPath = path.join(outputDir, "openrouter-games.json");
 const reportPath = path.join(outputDir, "openrouter-report.json");
-const MAX_OUTPUT_TOKENS = 5000;
+const MAX_OUTPUT_TOKENS = 20000;
 
 const apiKey = process.env.OPENROUTER_API_KEY;
 
@@ -25,8 +25,8 @@ const models = [
     id: "openai/gpt-5.5",
     label: "GPT 5.5",
     provider: "OpenRouter",
-    inputPricePerMillion: 0.1,
-    outputPricePerMillion: 0.4
+    inputPricePerMillion: 5,
+    outputPricePerMillion: 30
   },
   {
     id: "anthropic/claude-sonnet-4.6",
@@ -91,38 +91,6 @@ const gamePrompts = [
       "- The game must fit cleanly inside a square 480x480 iframe.",
       "- Support keyboard and pointer controls for the paddle.",
       "- Include ball physics, brick collision, score, lives or restart handling, and clear visual feedback.",
-      "- Keep the design tasteful and minimal.",
-      "- Keep the implementation compact and avoid unnecessary code or commentary.",
-      "- Do not depend on any external assets, fonts, libraries, or network requests."
-    ].join("\n")
-  },
-  {
-    key: "sokobanEntries",
-    game: "Sokoban",
-    slug: "sokoban",
-    prompt: [
-      "Build a polished browser Sokoban puzzle game as a single self-contained HTML document.",
-      "Requirements:",
-      "- Return only HTML, with inline CSS and JavaScript. No markdown fences.",
-      "- The game must fit cleanly inside a square 480x480 iframe.",
-      "- Support arrow keys and WASD.",
-      "- Include walls, boxes, targets, valid push rules, move count, restart handling, win feedback, and at least one compact level.",
-      "- Keep the design tasteful and minimal.",
-      "- Keep the implementation compact and avoid unnecessary code or commentary.",
-      "- Do not depend on any external assets, fonts, libraries, or network requests."
-    ].join("\n")
-  },
-  {
-    key: "pongEntries",
-    game: "Pong",
-    slug: "pong",
-    prompt: [
-      "Build a polished browser Pong game as a single self-contained HTML document.",
-      "Requirements:",
-      "- Return only HTML, with inline CSS and JavaScript. No markdown fences.",
-      "- The game must fit cleanly inside a square 480x480 iframe.",
-      "- Support keyboard and pointer controls for the player paddle.",
-      "- Include ball movement, paddle collision, opponent behavior, scoring, restart handling, and clear visual feedback.",
       "- Keep the design tasteful and minimal.",
       "- Keep the implementation compact and avoid unnecessary code or commentary.",
       "- Do not depend on any external assets, fonts, libraries, or network requests."
@@ -215,7 +183,15 @@ function mergeEntries(existingEntries, nextEntries) {
     byId.set(entry.id, entry);
   }
 
-  return Array.from(byId.values()).sort((left, right) => left.label.localeCompare(right.label));
+  return Array.from(byId.values()).sort((left, right) => {
+    const providerDiff =
+      (left.provider === "OpenRouter" ? 1 : 0) - (right.provider === "OpenRouter" ? 1 : 0);
+    if (providerDiff !== 0) {
+      return providerDiff;
+    }
+
+    return left.label.localeCompare(right.label);
+  });
 }
 
 async function createGame(model, gamePrompt) {
@@ -365,7 +341,7 @@ async function main() {
   );
 
   if (successCount === 0) {
-    throw new Error("No generations succeeded, so generated/games.json was left unchanged.");
+    throw new Error("No generations succeeded, so generated/openrouter-games.json was left unchanged.");
   }
 
   const existing = await loadExistingOutput();

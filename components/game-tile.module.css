@@ -101,18 +101,18 @@
     var(--surface);
   background-size: 18px 18px, 18px 18px, auto;
   box-shadow: 0 7px 0 var(--text), 0 18px 30px -24px var(--text);
-  cursor: pointer;
   transition:
     transform 140ms cubic-bezier(0.2, 0.7, 0.3, 1),
     box-shadow 140ms cubic-bezier(0.2, 0.7, 0.3, 1);
 }
 
-.frameWrap:hover {
+.frameWrap:has(.playButton:hover),
+.frameWrap:has(.playButton:focus-visible) {
   transform: translateY(-2px);
   box-shadow: 0 9px 0 var(--text), 0 24px 36px -24px var(--text);
 }
 
-.frameWrap:active {
+.frameWrap:has(.playButton:active) {
   transform: translateY(4px);
   box-shadow: 0 2px 0 var(--text), 0 8px 18px -18px var(--text);
 }
@@ -145,12 +145,19 @@
   justify-content: center;
   min-height: 44px;
   padding: 0 0.9rem;
+  border: 0;
   border-radius: var(--radius-pill);
   background: var(--accent);
+  font-size: 1rem;
   font-weight: 700;
   color: var(--text);
   box-shadow: 0 4px 0 var(--accent-deep);
-  pointer-events: none;
+  cursor: pointer;
+}
+
+.playButton:focus-visible {
+  outline: 3px solid var(--accent-cool);
+  outline-offset: 3px;
 }
 
 .hint {
@@ -196,10 +203,11 @@
 }
 
 .dialog {
-  width: min(1080px, calc(100vw - 2rem));
-  max-height: min(940px, calc(100dvh - 2rem));
+  width: min(640px, calc(100vw - 2rem));
+  max-height: calc(100dvh - 2rem);
   padding: 0;
-  overflow: hidden;
+  overflow: auto;
+  overscroll-behavior: contain;
   border: 2px solid var(--text);
   border-radius: 28px;
   color: var(--text);
@@ -208,17 +216,21 @@
 }
 
 .dialog::backdrop {
-  background: oklch(20% 0.012 250 / 0.55);
+  background: oklch(20% 0.012 250 / 0.62);
+  backdrop-filter: blur(5px);
 }
 
 .modalShell {
   display: grid;
-  gap: 0.9rem;
+  justify-items: center;
+  gap: 0.75rem;
   padding: 1rem;
+  overscroll-behavior: contain;
 }
 
 .modalHeader {
   display: grid;
+  width: 100%;
   grid-template-columns: minmax(0, 1fr) auto auto;
   gap: 0.8rem;
   align-items: center;
@@ -294,8 +306,8 @@
 }
 
 .modalFrameWrap {
+  width: min(520px, calc(100vw - 4rem), calc(100dvh - 12rem));
   aspect-ratio: 1 / 1;
-  max-height: calc(100dvh - 12rem);
   overflow: hidden;
   border: 2px solid var(--text);
   border-radius: 20px;
@@ -312,6 +324,7 @@
 }
 
 .modalHint {
+  width: 100%;
   margin: 0;
   font-size: 0.86rem;
   line-height: 1.45;
@@ -327,13 +340,35 @@
 @media (max-width: 640px) {
   .dialog {
     width: calc(100vw - 1rem);
+    max-height: calc(100dvh - 1rem);
+    border-radius: 20px;
+  }
+
+  .modalShell {
+    padding: 0.75rem;
+  }
+
+  .modalFrameWrap {
+    width: min(calc(100vw - 2.5rem), calc(100dvh - 15.5rem));
+    border-radius: 16px;
   }
 
   .modalHeader {
-    grid-template-columns: 1fr;
+    grid-template-columns: minmax(0, 1fr) auto;
+  }
+
+  .modalStats {
+    grid-column: 1 / -1;
+    grid-row: 2;
+    width: 100%;
+  }
+
+  .modalTitle {
+    font-size: clamp(1.35rem, 8vw, 2rem);
   }
 
   .closeButton {
-    width: 100%;
+    grid-column: 2;
+    grid-row: 1;
   }
 }

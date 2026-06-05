@@ -19,6 +19,197 @@ const sharedShell = (title: string, body: string, options?: { background?: strin
   </body>
 </html>`;
 
+const embeddedGamePrelude = `
+<script>
+(() => {
+  const store = new Map();
+  const storage = {
+    get length() {
+      return store.size;
+    },
+    key(index) {
+      return Array.from(store.keys())[index] ?? null;
+    },
+    getItem(key) {
+      key = String(key);
+      return store.has(key) ? store.get(key) : null;
+    },
+    setItem(key, value) {
+      store.set(String(key), String(value));
+    },
+    removeItem(key) {
+      store.delete(String(key));
+    },
+    clear() {
+      store.clear();
+    }
+  };
+
+  try {
+    Object.defineProperty(window, "localStorage", { configurable: true, value: storage });
+    Object.defineProperty(window, "sessionStorage", { configurable: true, value: storage });
+  } catch {}
+
+  const gameControlKeys = new Set([
+    "ArrowUp",
+    "ArrowDown",
+    "ArrowLeft",
+    "ArrowRight",
+    " ",
+    "Spacebar",
+    "w",
+    "W",
+    "a",
+    "A",
+    "s",
+    "S",
+    "d",
+    "D"
+  ]);
+
+  window.addEventListener(
+    "keydown",
+    (event) => {
+      if (gameControlKeys.has(event.key)) {
+        event.preventDefault();
+      }
+    },
+    { capture: true }
+  );
+
+  let sentPointerStartKey = false;
+
+  window.addEventListener("pointerdown", () => {
+    if (sentPointerStartKey) {
+      return;
+    }
+
+    sentPointerStartKey = true;
+    window.focus();
+    window.dispatchEvent(
+      new KeyboardEvent("keydown", {
+        bubbles: true,
+        cancelable: true,
+        key: "Enter"
+      })
+    );
+  });
+
+  const showError = (message) => {
+    const existing = document.getElementById("__game_runtime_error__");
+    if (existing) {
+      existing.textContent = message;
+      return;
+    }
+
+    const error = document.createElement("div");
+    error.id = "__game_runtime_error__";
+    error.textContent = message;
+    error.style.cssText = [
+      "position:fixed",
+      "inset:0",
+      "z-index:2147483647",
+      "display:grid",
+      "place-items:center",
+      "padding:24px",
+      "background:#121417",
+      "color:#f8fafc",
+      "font:600 15px/1.4 system-ui,-apple-system,Segoe UI,sans-serif",
+      "text-align:center"
+    ].join(";");
+    document.addEventListener("DOMContentLoaded", () => document.body.append(error), { once: true });
+    if (document.body) {
+      document.body.append(error);
+    }
+  };
+
+  window.addEventListener("error", (event) => {
+    showError("This generated game crashed: " + (event.message || "Unknown error"));
+  });
+
+  window.addEventListener("unhandledrejection", (event) => {
+    showError("This generated game crashed: " + (event.reason?.message || event.reason || "Unknown error"));
+  });
+})();
+<\/script>`;
+
+export function prepareEmbeddedGameHtml(html: string) {
+  if (html.includes("__game_runtime_error__")) {
+    return html;
+  }
+
+  if (/<head[^>]*>/i.test(html)) {
+    return html.replace(/<head([^>]*)>/i, `<head$1>${embeddedGamePrelude}`);
+  }
+
+  return `${embeddedGamePrelude}${html}`;
+}
+
+function scriptsFromHtml(html: string) {
+  return Array.from(html.matchAll(/<script[^>]*>([\s\S]*?)<\/script>/gi)).map(
+    (match) => match[1]
+  );
+}
+
+export function getGeneratedHtmlSyntaxError(html: string) {
+  for (const script of scriptsFromHtml(html)) {
+    try {
+      new Function(script);
+    } catch (error) {
+      return error instanceof Error ? error.message : String(error);
+    }
+  }
+
+  return null;
+}
+
+function escapeHtml(value: string) {
+  return value
+    .replaceAll("&", "&amp;")
+    .replaceAll("<", "&lt;")
+    .replaceAll(">", "&gt;")
+    .replaceAll('"', "&quot;");
+}
+
+export function repairedSokobanHtml(label: string, reason: string) {
+  const title = escapeHtml(`${label} Sokoban`);
+
+  return `<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>${title}</title>
+<style>
+*{box-sizing:border-box}html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#111827;color:#f8fafc;font-family:system-ui,-apple-system,Segoe UI,sans-serif}
+body{display:grid;place-items:center}.game{width:480px;height:480px;display:grid;grid-template-rows:auto 1fr auto;gap:12px;padding:18px;background:#111827}
+header{display:flex;align-items:center;justify-content:space-between;gap:12px}.title{min-width:0}.title strong{display:block;font-size:18px}.title span{display:block;margin-top:3px;color:#9ca3af;font-size:12px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.stats{display:flex;gap:8px;color:#d1d5db;font-size:13px}.board{display:grid;grid-template-columns:repeat(8,1fr);grid-template-rows:repeat(6,1fr);gap:4px;align-self:center;aspect-ratio:8/6;padding:8px;border:1px solid #374151;border-radius:12px;background:#0b1020}
+.cell{position:relative;border-radius:7px;background:#1f2937}.wall{background:#020617}.target::after{content:"";position:absolute;inset:28%;border:2px solid #facc15;border-radius:50%}.box{background:#38bdf8;box-shadow:inset 0 -5px 0 rgba(0,0,0,.18)}.box.target{background:#22c55e}.player{background:#f97316;border-radius:999px}
+footer{display:flex;justify-content:space-between;align-items:center;gap:12px;color:#9ca3af;font-size:12px}button{border:0;border-radius:999px;background:#facc15;color:#111827;padding:9px 13px;font-weight:800;cursor:pointer}.win{color:#86efac;font-weight:800}
+</style>
+</head>
+<body>
+<main class="game">
+<header><div class="title"><strong>${title}</strong><span>Repaired fallback: ${escapeHtml(reason)}</span></div><div class="stats"><span>Moves <b id="moves">0</b></span></div></header>
+<section id="board" class="board" tabindex="0" aria-label="Sokoban board"></section>
+<footer><span id="status">Push both boxes onto the yellow targets.</span><button id="restart" type="button">Restart</button></footer>
+</main>
+<script>
+const level=["########","#      #","# $ .  #","#  @   #","#  . $ #","########"];
+const board=document.getElementById("board"),movesEl=document.getElementById("moves"),statusEl=document.getElementById("status"),restart=document.getElementById("restart");
+let walls,targets,boxes,player,moves;
+const key=(x,y)=>x+","+y;
+function reset(){walls=new Set();targets=new Set();boxes=new Set();moves=0;statusEl.className="";statusEl.textContent="Push both boxes onto the yellow targets.";movesEl.textContent="0";for(let y=0;y<level.length;y++){for(let x=0;x<level[y].length;x++){const c=level[y][x],k=key(x,y);if(c=="#")walls.add(k);if(c==".")targets.add(k);if(c=="$")boxes.add(k);if(c=="@")player={x,y};}}draw();board.focus();}
+function draw(){board.innerHTML="";for(let y=0;y<level.length;y++){for(let x=0;x<level[y].length;x++){const k=key(x,y),cell=document.createElement("div");cell.className="cell";if(walls.has(k))cell.classList.add("wall");if(targets.has(k))cell.classList.add("target");if(boxes.has(k))cell.classList.add("box");if(boxes.has(k)&&targets.has(k))cell.classList.add("target");if(player.x===x&&player.y===y)cell.classList.add("player");board.append(cell);}}}
+function move(dx,dy){const next=key(player.x+dx,player.y+dy);if(walls.has(next))return;if(boxes.has(next)){const beyond=key(player.x+dx*2,player.y+dy*2);if(walls.has(beyond)||boxes.has(beyond))return;boxes.delete(next);boxes.add(beyond);}player={x:player.x+dx,y:player.y+dy};moves++;movesEl.textContent=String(moves);draw();if([...boxes].every((box)=>targets.has(box))){statusEl.className="win";statusEl.textContent="Solved. Press Restart to play again.";}}
+document.addEventListener("keydown",(event)=>{const dirs={ArrowUp:[0,-1],w:[0,-1],W:[0,-1],ArrowDown:[0,1],s:[0,1],S:[0,1],ArrowLeft:[-1,0],a:[-1,0],A:[-1,0],ArrowRight:[1,0],d:[1,0],D:[1,0]};const dir=dirs[event.key];if(dir){event.preventDefault();move(dir[0],dir[1]);}if(event.key==="r"||event.key==="R")reset();});
+restart.addEventListener("click",reset);reset();
+<\/script>
+</body>
+</html>`;
+}
+
 export const snakeGameHtml = sharedShell(
   "GPT 5.4 Snake",
   `
@@ -251,4 +442,3 @@ export const snakeGameHtml = sharedShell(
     <\/script>
   `
 );
-

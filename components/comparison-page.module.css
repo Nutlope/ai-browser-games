@@ -8,11 +8,11 @@
 
 .hero {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) minmax(300px, 390px);
+  grid-template-columns: minmax(0, 1fr);
   grid-template-areas:
-    "copy panel"
-    "nav panel";
-  gap: 1rem 1.25rem;
+    "copy"
+    "nav";
+  gap: 1rem;
   align-items: end;
   padding: 1rem 0 1.5rem;
 }
@@ -32,6 +32,7 @@
   font-family: var(--font-mono);
   font-size: 0.75rem;
   color: var(--text-soft);
+  text-decoration: none;
 }
 
 .title {
@@ -59,53 +60,6 @@
   color: var(--text-muted);
 }
 
-.panel {
-  grid-area: panel;
-  display: grid;
-  gap: 0.85rem;
-  padding: 1rem;
-  border: 1px solid var(--border);
-  border-radius: 28px;
-  background: var(--accent);
-  box-shadow: var(--shadow);
-}
-
-.panelLabel {
-  font-family: var(--font-mono);
-  font-size: 0.72rem;
-  color: var(--text-soft);
-}
-
-.stats {
-  display: grid;
-  gap: 0.55rem;
-  margin: 0;
-}
-
-.stats div {
-  display: flex;
-  align-items: baseline;
-  justify-content: space-between;
-  gap: 1rem;
-  padding: 0.65rem 0 0;
-  border-top: 1px solid oklch(48% 0.06 95 / 0.35);
-}
-
-.stats dt {
-  font-family: var(--font-mono);
-  font-size: 0.75rem;
-  color: var(--text-soft);
-}
-
-.stats dd {
-  margin: 0;
-  font-family: var(--font-mono);
-  font-size: 1.08rem;
-  font-weight: 500;
-  color: var(--text);
-  font-variant-numeric: tabular-nums;
-}
-
 .nav {
   grid-area: nav;
   display: flex;
@@ -114,8 +68,7 @@
   align-items: center;
 }
 
-.navLink,
-.tableLink {
+.navLink {
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -133,8 +86,7 @@
     background-color 160ms var(--ease-out);
 }
 
-.navLink:hover,
-.tableLink:hover {
+.navLink:hover {
   transform: translateY(-2px);
   background: var(--accent-cool-soft);
   box-shadow: 0 5px 0 var(--border);
@@ -193,12 +145,15 @@
 .ledgerSection {
   display: grid;
   gap: 1rem;
+  justify-items: center;
   padding: 1.4rem 0 1.2rem;
 }
 
 .sectionHeader {
   display: grid;
   gap: 0.6rem;
+  justify-items: center;
+  width: min(100%, 1140px);
   max-width: 48rem;
 }
 
@@ -210,6 +165,7 @@
 }
 
 .ledgerWrap {
+  width: min(100%, 1140px);
   overflow-x: auto;
   border: 1px solid var(--border);
   border-radius: 24px;
@@ -219,7 +175,7 @@
 
 .ledgerTable {
   width: 100%;
-  min-width: 920px;
+  min-width: 760px;
   border-collapse: collapse;
 }
 
@@ -244,12 +200,6 @@
   font-variant-numeric: tabular-nums;
 }
 
-.tableLink {
-  min-height: 34px;
-  padding: 0.3rem 0.75rem;
-  font-size: 0.84rem;
-}
-
 .emptyLedger {
   margin: 0;
   padding: 1rem;
@@ -270,10 +220,8 @@
   }
 
   .hero {
-    grid-template-columns: 1fr;
     grid-template-areas:
       "copy"
-      "panel"
       "nav";
     align-items: flex-start;
   }

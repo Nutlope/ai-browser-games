@@ -5,32 +5,84 @@ import styles from "./page.module.css";
 export default function HomePage() {
   const gameCount = allEntries.length;
   const modelCount = new Set(allEntries.map((entry) => entry.model)).size;
-  const totalTokens = allEntries.reduce((sum, entry) => sum + (entry.totalTokens ?? 0), 0);
-  const totalCost = allEntries.reduce((sum, entry) => sum + (entry.generationCostUsd ?? 0), 0);
   const pricedEntries = allEntries.filter((entry) => entry.generationCostUsd != null);
-  const cheapestEntry = [...pricedEntries].sort(
-    (a, b) => (a.generationCostUsd ?? Number.POSITIVE_INFINITY) - (b.generationCostUsd ?? Number.POSITIVE_INFINITY)
-  )[0];
-  const biggestEntry = [...allEntries].sort((a, b) => (b.totalTokens ?? 0) - (a.totalTokens ?? 0))[0];
-  const tableEntries = [...allEntries]
-    .sort((a, b) => (b.totalTokens ?? 0) - (a.totalTokens ?? 0))
-    .slice(0, 6);
-  const getEntryHref = (gameName: string) => {
-    const definition = gameDefinitions.find((game) => game.name === gameName || game.title === gameName);
+  const modelComparisons = Array.from(
+    pricedEntries.reduce((groups, entry) => {
+      const current = groups.get(entry.label) ?? [];
+      current.push(entry);
+      groups.set(entry.label, current);
 
-    return definition ? `/${definition.slug}` : "/";
+      return groups;
+    }, new Map<string, typeof pricedEntries>())
+  )
+    .map(([label, entries]) => {
+      const costs = entries.map((entry) => entry.generationCostUsd ?? 0);
+      const averageCost = costs.reduce((sum, cost) => sum + cost, 0) / costs.length;
+      const cheapestRun = [...entries].sort(
+        (a, b) => (a.generationCostUsd ?? Number.POSITIVE_INFINITY) - (b.generationCostUsd ?? Number.POSITIVE_INFINITY)
+      )[0];
+
+      return {
+        label,
+        entries,
+        averageCost,
+        cheapestRun
+      };
+    })
+    .sort((a, b) => a.averageCost - b.averageCost);
+  const baselineModel =
+    modelComparisons.find((comparison) => comparison.label === "MiniMax M2.7") ?? modelComparisons[0];
+  const kimiComparison = modelComparisons.find((comparison) => comparison.label === "Kimi K2.6");
+  const opusComparison = modelComparisons.find((comparison) => comparison.label === "Opus 4.8");
+  const gptComparison = modelComparisons.find((comparison) => comparison.label === "GPT 5.5");
+  const formatShortModelName = (label: string) => (label === "MiniMax M2.7" ? "M2.7" : label);
+  const comparisonCards = [
+    {
+      label: "Cheapest average",
+      value: baselineModel ? formatShortModelName(baselineModel.label) : "TBD",
+      detail: baselineModel ? `$${baselineModel.averageCost.toFixed(4)} avg/run` : "No price yet"
+    },
+    {
+      label: "Opus vs MiniMax",
+      value: formatCostMultiple(opusComparison, baselineModel),
+      detail: opusComparison && baselineModel ? `$${opusComparison.averageCost.toFixed(4)} avg/run` : "No price yet"
+    },
+    {
+      label: "GPT 5.5 vs MiniMax",
+      value: formatCostMultiple(gptComparison, baselineModel),
+      detail: gptComparison && baselineModel ? `$${gptComparison.averageCost.toFixed(4)} avg/run` : "No price yet"
+    },
+    {
+      label: "Kimi vs Opus",
+      value: formatCostMultiple(opusComparison, kimiComparison),
+      detail: opusComparison && kimiComparison ? "Opus 4.8 vs Kimi K2.6" : "No price yet"
+    }
+  ];
+
+  function formatCostMultiple(
+    comparison: (typeof modelComparisons)[number] | undefined,
+    baseline: (typeof modelComparisons)[number] | undefined
+  ) {
+    if (!comparison || !baseline?.averageCost) {
+      return "TBD";
+    }
+
+    const multiple = comparison.averageCost / baseline.averageCost;
+
+    if (multiple === 1) {
+      return "Baseline";
+    }
+
+    return `${multiple >= 10 ? multiple.toFixed(0) : multiple.toFixed(1)}x`;
   };
 
   return (
     <main className={styles.page}>
       <header className={styles.masthead}>
         <div className={styles.brand}>
-          <span className={styles.dot} /> Bubble Bench
+          <span className={styles.dot} /> AI Browser Games
         </div>
         <nav className={styles.mastheadActions} aria-label="Primary">
-          <Link href="#model-ledger" className={styles.mastheadLink}>
-            Price table
-          </Link>
           {gameDefinitions.map((game) => (
             <Link key={game.slug} href={`/${game.slug}`} className={styles.mastheadLink}>
               {game.name}
@@ -42,10 +94,9 @@ export default function HomePage() {
       <section className={styles.hero}>
         <div className={styles.heroCopy}>
           <p className={styles.kicker}>Playable games, priced honestly.</p>
-          <h1 className={styles.title}>See what each model spent to make the game.</h1>
+          <h1 className={styles.title}>LLM game benchmarks</h1>
           <p className={styles.description}>
-            Every tile is playable. Every run carries its token count and build cost, so the
-            comparison is about more than which game feels best.
+            Watch different AI models build the same game to see the difference in quality and price.
           </p>
           <div className={styles.actions}>
             <Link href="/snake" className={styles.primaryAction}>
@@ -58,66 +109,49 @@ export default function HomePage() {
           </div>
         </div>
 
-        <aside className={styles.heroBoard} aria-label="Benchmark totals">
+        <aside className={styles.heroBoard} aria-label="Average model cost comparisons">
           <span className={styles.bubbleMascot} aria-hidden="true" />
-          <div className={styles.heroMetric}>
-            <span>Total spend</span>
-            <strong>{totalCost ? `$${totalCost.toFixed(3)}` : "TBD"}</strong>
-            <p>Across generated playable outputs.</p>
-          </div>
-          <div className={styles.heroMetric}>
-            <span>Total tokens</span>
-            <strong>{totalTokens ? totalTokens.toLocaleString() : "TBD"}</strong>
-            <p>Input and output tokens combined.</p>
-          </div>
-          <div className={styles.heroAside}>
-            <span>Cheapest build</span>
-            <strong>{cheapestEntry ? cheapestEntry.label : "TBD"}</strong>
-            <p>{cheapestEntry?.generationCostUsd != null ? `$${cheapestEntry.generationCostUsd.toFixed(4)}` : "No price yet"}</p>
-          </div>
-          <div className={styles.heroAside}>
-            <span>Most tokens</span>
-            <strong>{biggestEntry ? biggestEntry.label : "TBD"}</strong>
-            <p>{biggestEntry?.totalTokens ? biggestEntry.totalTokens.toLocaleString() : "No token count yet"}</p>
-          </div>
+          {comparisonCards.map((card, index) => (
+            <div key={card.label} className={index < 2 ? styles.heroMetric : styles.heroAside}>
+              <span>{card.label}</span>
+              <strong>{card.value}</strong>
+              <p>{card.detail}</p>
+            </div>
+          ))}
         </aside>
       </section>
 
       <section className={styles.ledgerSection} id="model-ledger" aria-label="Model price and token ledger">
         <div className={styles.sectionHeader}>
-          <p className={styles.kicker}>Model ledger</p>
-          <h2 className={styles.sectionTitle}>Token-heavy and cost-light runs, side by side.</h2>
+          <p className={styles.kicker}>Model averages</p>
+          <h2 className={styles.sectionTitle}>Average build cost, compared against MiniMax.</h2>
         </div>
         <div className={styles.ledgerWrap}>
           <table className={styles.ledgerTable}>
             <thead>
               <tr>
-                <th>Run</th>
-                <th>Game</th>
                 <th>Model</th>
-                <th>Tokens</th>
-                <th>Build cost</th>
-                <th>Play</th>
+                <th>Runs</th>
+                <th>Avg build cost</th>
+                <th>Vs MiniMax</th>
+                <th>Cheapest run</th>
+                <th>Cheapest cost</th>
               </tr>
             </thead>
             <tbody>
-              {tableEntries.map((entry) => (
-                <tr key={entry.id}>
-                  <td>{entry.label}</td>
-                  <td>{entry.game}</td>
-                  <td>{entry.model}</td>
-                  <td>{entry.totalTokens?.toLocaleString() ?? "TBD"}</td>
-                  <td>{entry.generationCostUsd != null ? `$${entry.generationCostUsd.toFixed(4)}` : "TBD"}</td>
-                  <td>
-                    <Link href={getEntryHref(entry.game)} className={styles.tableLink}>
-                      Open
-                    </Link>
-                  </td>
+              {modelComparisons.map((comparison) => (
+                <tr key={comparison.label}>
+                  <td>{comparison.label}</td>
+                  <td>{comparison.entries.length}</td>
+                  <td>${comparison.averageCost.toFixed(4)}</td>
+                  <td>{formatCostMultiple(comparison, baselineModel)}</td>
+                  <td>{comparison.cheapestRun.game}</td>
+                  <td>{comparison.cheapestRun.generationCostUsd != null ? `$${comparison.cheapestRun.generationCostUsd.toFixed(4)}` : "TBD"}</td>
                 </tr>
               ))}
             </tbody>
           </table>
-          {tableEntries.length === 0 ? (
+          {modelComparisons.length === 0 ? (
             <p className={styles.emptyLedger}>Generate a game run to populate the price table.</p>
           ) : null}
         </div>

@@ -9,8 +9,8 @@ const rootDir = path.resolve(__dirname, "..");
 const outputDir = path.join(rootDir, "generated");
 const outputPath = path.join(outputDir, "games.json");
 const reportPath = path.join(outputDir, "together-report.json");
-const MAX_OUTPUT_TOKENS = 16000;
-const REQUEST_TIMEOUT_MS = 300000;
+const MAX_OUTPUT_TOKENS = 20000;
+const REQUEST_TIMEOUT_MS = 250000;
 
 const apiKey = process.env.TOGETHER_API_KEY;
 
@@ -44,11 +44,11 @@ const models = [
     outputPricePerMillion: 4.4,
   },
   {
-    id: "openai/gpt-oss-120b",
-    label: "GPT-OSS 120B",
+    id: "nvidia/nemotron-3-ultra-550b-a55b",
+    label: "Nemotron 3 Ultra 550B",
     provider: "Together",
-    inputPricePerMillion: 0.15,
-    outputPricePerMillion: 0.6,
+    inputPricePerMillion: 0.60,
+    outputPricePerMillion: 3.60,
   },
 ];
 
@@ -99,38 +99,6 @@ const gamePrompts = [
       "- The game must fit cleanly inside a square 480x480 iframe.",
       "- Support keyboard and pointer controls for the paddle.",
       "- Include ball physics, brick collision, score, lives or restart handling, and clear visual feedback.",
-      "- Keep the design tasteful and minimal.",
-      "- Keep the implementation compact and avoid unnecessary code or commentary.",
-      "- Do not depend on any external assets, fonts, libraries, or network requests.",
-    ].join("\n"),
-  },
-  {
-    key: "sokobanEntries",
-    game: "Sokoban",
-    slug: "sokoban",
-    prompt: [
-      "Build a polished browser Sokoban puzzle game as a single self-contained HTML document.",
-      "Requirements:",
-      "- Return only HTML, with inline CSS and JavaScript. No markdown fences.",
-      "- The game must fit cleanly inside a square 480x480 iframe.",
-      "- Support arrow keys and WASD.",
-      "- Include walls, boxes, targets, valid push rules, move count, restart handling, win feedback, and at least one compact level.",
-      "- Keep the design tasteful and minimal.",
-      "- Keep the implementation compact and avoid unnecessary code or commentary.",
-      "- Do not depend on any external assets, fonts, libraries, or network requests.",
-    ].join("\n"),
-  },
-  {
-    key: "pongEntries",
-    game: "Pong",
-    slug: "pong",
-    prompt: [
-      "Build a polished browser Pong game as a single self-contained HTML document.",
-      "Requirements:",
-      "- Return only HTML, with inline CSS and JavaScript. No markdown fences.",
-      "- The game must fit cleanly inside a square 480x480 iframe.",
-      "- Support keyboard and pointer controls for the player paddle.",
-      "- Include ball movement, paddle collision, opponent behavior, scoring, restart handling, and clear visual feedback.",
       "- Keep the design tasteful and minimal.",
       "- Keep the implementation compact and avoid unnecessary code or commentary.",
       "- Do not depend on any external assets, fonts, libraries, or network requests.",

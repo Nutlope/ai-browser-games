@@ -37,8 +37,8 @@ export default function WalkthroughPage() {
           <Link href="/snake" className={styles.link}>
             Open snake page
           </Link>
-          <Link href="/tetris-lite" className={styles.link}>
-            Open Tetris-lite page
+          <Link href="/tetris" className={styles.link}>
+            Open Tetris page
           </Link>
         </div>
       </header>

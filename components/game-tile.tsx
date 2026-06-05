@@ -12,6 +12,8 @@ export function GameTile({ entry }: GameTileProps) {
   const iframeRef = useRef<HTMLIFrameElement>(null);
   const dialogRef = useRef<HTMLDialogElement>(null);
   const modalIframeRef = useRef<HTMLIFrameElement>(null);
+  const playButtonRef = useRef<HTMLButtonElement>(null);
+  const scrollPositionRef = useRef(0);
   const [isOpen, setIsOpen] = useState(false);
   const metadata = [
     {
@@ -59,25 +61,65 @@ export function GameTile({ entry }: GameTileProps) {
       return;
     }
 
-    const originalOverflow = document.body.style.overflow;
+    const gameControlKeys = new Set([
+      "ArrowUp",
+      "ArrowDown",
+      "ArrowLeft",
+      "ArrowRight",
+      " ",
+      "Spacebar",
+      "w",
+      "W",
+      "a",
+      "A",
+      "s",
+      "S",
+      "d",
+      "D"
+    ]);
+    const originalHtmlOverflow = document.documentElement.style.overflow;
+    const originalBodyOverflow = document.body.style.overflow;
+    const originalBodyPosition = document.body.style.position;
+    const originalBodyTop = document.body.style.top;
+    const originalBodyWidth = document.body.style.width;
+
+    scrollPositionRef.current = window.scrollY;
+    document.documentElement.style.overflow = "hidden";
     document.body.style.overflow = "hidden";
+    document.body.style.position = "fixed";
+    document.body.style.top = `-${scrollPositionRef.current}px`;
+    document.body.style.width = "100%";
     window.setTimeout(() => modalIframeRef.current?.focus(), 60);
 
-    const preventPageScroll = (event: KeyboardEvent) => {
-      if (document.activeElement instanceof HTMLButtonElement) {
+    const lockPageKeys = (event: KeyboardEvent) => {
+      if (event.key === "Escape") {
         return;
       }
 
-      if (["ArrowUp", "ArrowDown", "ArrowLeft", "ArrowRight", " "].includes(event.key)) {
+      if (gameControlKeys.has(event.key)) {
         event.preventDefault();
+        event.stopPropagation();
       }
     };
 
-    window.addEventListener("keydown", preventPageScroll, { capture: true });
+    const lockPageMovement = (event: WheelEvent | TouchEvent) => {
+      event.preventDefault();
+    };
+
+    window.addEventListener("keydown", lockPageKeys, { capture: true });
+    window.addEventListener("wheel", lockPageMovement, { capture: true, passive: false });
+    window.addEventListener("touchmove", lockPageMovement, { capture: true, passive: false });
 
     return () => {
-      document.body.style.overflow = originalOverflow;
-      window.removeEventListener("keydown", preventPageScroll, { capture: true });
+      document.documentElement.style.overflow = originalHtmlOverflow;
+      document.body.style.overflow = originalBodyOverflow;
+      document.body.style.position = originalBodyPosition;
+      document.body.style.top = originalBodyTop;
+      document.body.style.width = originalBodyWidth;
+      window.scrollTo(0, scrollPositionRef.current);
+      window.removeEventListener("keydown", lockPageKeys, { capture: true });
+      window.removeEventListener("wheel", lockPageMovement, { capture: true });
+      window.removeEventListener("touchmove", lockPageMovement, { capture: true });
     };
   }, [isOpen]);
 
@@ -99,6 +141,22 @@ export function GameTile({ entry }: GameTileProps) {
     };
   }, []);
 
+  useEffect(() => {
+    const button = playButtonRef.current;
+
+    if (!button) {
+      return;
+    }
+
+    button.addEventListener("click", openGame);
+    button.addEventListener("pointerdown", openGame);
+
+    return () => {
+      button.removeEventListener("click", openGame);
+      button.removeEventListener("pointerdown", openGame);
+    };
+  }, []);
+
   return (
     <article className={styles.tile} id={entry.id}>
       <header className={styles.header}>
@@ -112,12 +170,7 @@ export function GameTile({ entry }: GameTileProps) {
           {entry.generationCostUsd != null ? `$${entry.generationCostUsd.toFixed(4)}` : "Ready"}
         </span>
       </header>
-      <button
-        className={styles.frameWrap}
-        type="button"
-        onClick={openGame}
-        aria-label={`Play ${entry.label} ${entry.game}`}
-      >
+      <div className={styles.frameWrap}>
         <iframe
           ref={iframeRef}
           className={styles.frame}
@@ -128,8 +181,17 @@ export function GameTile({ entry }: GameTileProps) {
           tabIndex={-1}
           aria-hidden="true"
         />
-        <span className={styles.playButton}>Play game</span>
-      </button>
+        <button
+          ref={playButtonRef}
+          className={styles.playButton}
+          type="button"
+          onClick={openGame}
+          onPointerDown={openGame}
+          aria-label={`Play ${entry.label} ${entry.game}`}
+        >
+          Play game
+        </button>
+      </div>
       <p className={styles.hint}>Play it first, then compare the cost and token receipt below.</p>
       <dl className={styles.metaGrid}>
         {metadata.map((item) => (

@@ -32,6 +32,7 @@ export default async function GamePage({ params }: GamePageProps) {
       description={game.description}
       note="Each tile can carry generation metadata alongside the playable result, so the gallery can compare quality, token count, and spend across models."
       entries={entriesByGame[game.slug as GameSlug]}
+      costFocused
     />
   );
 }

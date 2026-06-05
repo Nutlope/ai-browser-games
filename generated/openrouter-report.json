@@ -1,113 +1,113 @@
 {
   "provider": "OpenRouter",
-  "generatedAt": "2026-06-04T21:10:39.513Z",
+  "generatedAt": "2026-06-05T05:18:33.232Z",
   "successCount": 15,
   "failureCount": 0,
   "successes": [
     {
       "model": "anthropic/claude-opus-4.8",
       "game": "Snake",
-      "outputTokens": 2655,
-      "totalTokens": 2893,
-      "costUsd": 0.202695
+      "outputTokens": 1728,
+      "totalTokens": 1966,
+      "costUsd": 0.13317
     },
     {
       "model": "openai/gpt-5.5",
       "game": "Snake",
-      "outputTokens": 2094,
-      "totalTokens": 2240,
-      "costUsd": 0.000852
+      "outputTokens": 2057,
+      "totalTokens": 2203,
+      "costUsd": 0.06244
     },
     {
       "model": "anthropic/claude-sonnet-4.6",
       "game": "Snake",
-      "outputTokens": 2363,
-      "totalTokens": 2525,
-      "costUsd": 0.035931
+      "outputTokens": 2509,
+      "totalTokens": 2671,
+      "costUsd": 0.038121
     },
     {
       "model": "anthropic/claude-opus-4.8",
       "game": "Tetris-lite",
-      "outputTokens": 3210,
-      "totalTokens": 3472,
-      "costUsd": 0.24468
+      "outputTokens": 3339,
+      "totalTokens": 3601,
+      "costUsd": 0.254355
     },
     {
       "model": "openai/gpt-5.5",
       "game": "Tetris-lite",
-      "outputTokens": 3756,
-      "totalTokens": 3913,
-      "costUsd": 0.001518
+      "outputTokens": 3088,
+      "totalTokens": 3245,
+      "costUsd": 0.093425
     },
     {
       "model": "anthropic/claude-sonnet-4.6",
       "game": "Tetris-lite",
-      "outputTokens": 3403,
-      "totalTokens": 3578,
-      "costUsd": 0.05157
+      "outputTokens": 3248,
+      "totalTokens": 3423,
+      "costUsd": 0.049245
     },
     {
       "model": "anthropic/claude-opus-4.8",
       "game": "Breakout",
-      "outputTokens": 2546,
-      "totalTokens": 2782,
-      "costUsd": 0.19449
+      "outputTokens": 2487,
+      "totalTokens": 2723,
+      "costUsd": 0.190065
     },
     {
       "model": "openai/gpt-5.5",
       "game": "Breakout",
-      "outputTokens": 3115,
-      "totalTokens": 3258,
-      "costUsd": 0.00126
+      "outputTokens": 4951,
+      "totalTokens": 5094,
+      "costUsd": 0.149245
     },
     {
       "model": "anthropic/claude-sonnet-4.6",
       "game": "Breakout",
-      "outputTokens": 2446,
-      "totalTokens": 2603,
-      "costUsd": 0.037161
+      "outputTokens": 3353,
+      "totalTokens": 3510,
+      "costUsd": 0.050766
     },
     {
       "model": "anthropic/claude-opus-4.8",
       "game": "Sokoban",
-      "outputTokens": 2443,
-      "totalTokens": 2686,
-      "costUsd": 0.18687
+      "outputTokens": 2170,
+      "totalTokens": 2413,
+      "costUsd": 0.166395
     },
     {
       "model": "openai/gpt-5.5",
       "game": "Sokoban",
-      "outputTokens": 4063,
-      "totalTokens": 4213,
-      "costUsd": 0.00164
+      "outputTokens": 1973,
+      "totalTokens": 2123,
+      "costUsd": 0.05994
     },
     {
       "model": "anthropic/claude-sonnet-4.6",
       "game": "Sokoban",
-      "outputTokens": 2794,
-      "totalTokens": 2960,
-      "costUsd": 0.042408
+      "outputTokens": 3192,
+      "totalTokens": 3358,
+      "costUsd": 0.048378
     },
     {
       "model": "anthropic/claude-opus-4.8",
       "game": "Pong",
-      "outputTokens": 2680,
-      "totalTokens": 2923,
-      "costUsd": 0.204645
+      "outputTokens": 2328,
+      "totalTokens": 2571,
+      "costUsd": 0.178245
     },
     {
       "model": "openai/gpt-5.5",
       "game": "Pong",
-      "outputTokens": 2839,
-      "totalTokens": 2983,
-      "costUsd": 0.00115
+      "outputTokens": 2384,
+      "totalTokens": 2528,
+      "costUsd": 0.07224
     },
     {
       "model": "anthropic/claude-sonnet-4.6",
       "game": "Pong",
-      "outputTokens": 2601,
-      "totalTokens": 2760,
-      "costUsd": 0.039492
+      "outputTokens": 2836,
+      "totalTokens": 2995,
+      "costUsd": 0.043017
     }
   ],
   "failures": []

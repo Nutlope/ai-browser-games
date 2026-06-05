@@ -1,8 +1,13 @@
-import { snakeGameHtml } from "@/lib/game-html";
+import {
+  getGeneratedHtmlSyntaxError,
+  prepareEmbeddedGameHtml,
+  snakeGameHtml
+} from "@/lib/game-html";
 import type { GameEntry } from "@/types/game";
 import generatedGames from "@/generated/games.json";
+import openrouterGames from "@/generated/openrouter-games.json";
 
-export type GameSlug = "snake" | "tetris-lite" | "breakout" | "sokoban" | "pong";
+export type GameSlug = "snake" | "tetris" | "breakout";
 
 export type GameDefinition = {
   slug: GameSlug;
@@ -17,11 +22,75 @@ type GeneratedGamesFile = {
   snakeEntries?: GameEntry[];
   tetrisLiteEntries?: GameEntry[];
   breakoutEntries?: GameEntry[];
-  sokobanEntries?: GameEntry[];
-  pongEntries?: GameEntry[];
 };
 
 const generated = generatedGames as GeneratedGamesFile;
+const openrouter = openrouterGames as GeneratedGamesFile;
+
+function providerSortRank(provider?: string) {
+  if (provider === "OpenRouter") {
+    return 1;
+  }
+
+  return 0;
+}
+
+function sortEntriesForDisplay(entries: GameEntry[]) {
+  return [...entries].sort((left, right) => {
+    const providerDiff =
+      providerSortRank(left.provider) - providerSortRank(right.provider);
+
+    if (providerDiff !== 0) {
+      return providerDiff;
+    }
+
+    return left.label.localeCompare(right.label);
+  });
+}
+
+function prepareEntryForDisplay(entry: GameEntry): GameEntry {
+  const syntaxError = getGeneratedHtmlSyntaxError(entry.html);
+
+  return {
+    ...entry,
+    game: entry.game === "Tetris-lite" ? "Tetris" : entry.game,
+    html: prepareEmbeddedGameHtml(entry.html),
+    description: syntaxError
+      ? `${entry.description ?? ""} Generated script did not parse cleanly: ${syntaxError}`.trim()
+      : entry.description
+  };
+}
+
+function mergeGameEntries(
+  togetherEntries: GameEntry[] | undefined,
+  openrouterEntries: GameEntry[] | undefined
+) {
+  const byId = new Map<string, GameEntry>();
+
+  for (const entry of togetherEntries ?? []) {
+    if (entry.provider === "OpenRouter") {
+      continue;
+    }
+
+    byId.set(entry.id, entry);
+  }
+
+  for (const entry of openrouterEntries ?? []) {
+    byId.set(entry.id, entry);
+  }
+
+  for (const entry of togetherEntries ?? []) {
+    if (entry.provider === "OpenRouter") {
+      byId.set(entry.id, entry);
+    }
+  }
+
+  return sortEntriesForDisplay(Array.from(byId.values())).map(prepareEntryForDisplay);
+}
+
+function entriesForKey(key: keyof GeneratedGamesFile) {
+  return mergeGameEntries(generated[key], openrouter[key]);
+}
 
 export const gameDefinitions: GameDefinition[] = [
   {
@@ -34,10 +103,10 @@ export const gameDefinitions: GameDefinition[] = [
     cardText: "Grid movement, collision logic, scoring, and keyboard feel."
   },
   {
-    slug: "tetris-lite",
+    slug: "tetris",
     entriesKey: "tetrisLiteEntries",
-    name: "Tetris-lite",
-    title: "Tetris-lite",
+    name: "Tetris",
+    title: "Tetris",
     description:
       "A compact falling-block benchmark for comparing rotation, collision handling, line clears, scoring, and speed ramping.",
     cardText: "Piece rotation, line clears, board state, and pacing."
@@ -50,24 +119,6 @@ export const gameDefinitions: GameDefinition[] = [
     description:
       "A paddle-and-ball benchmark for comparing physics, brick collision, scoring, levels, and visual feedback.",
     cardText: "Ball physics, paddle control, brick hits, and polish."
-  },
-  {
-    slug: "sokoban",
-    entriesKey: "sokobanEntries",
-    name: "Sokoban",
-    title: "Sokoban",
-    description:
-      "A grid puzzle benchmark for comparing deterministic movement, push rules, level completion, undo, and readable board design.",
-    cardText: "Grid rules, box pushes, goals, and puzzle clarity."
-  },
-  {
-    slug: "pong",
-    entriesKey: "pongEntries",
-    name: "Pong",
-    title: "Pong",
-    description:
-      "A simple arcade benchmark for comparing paddle responsiveness, ball movement, scoring, restart flow, and baseline polish.",
-    cardText: "Paddle feel, ball motion, scoring, and restart handling."
   }
 ];
 
@@ -88,22 +139,18 @@ const fallbackSnakeEntries: GameEntry[] = [
   }
 ];
 
-export const snakeEntries: GameEntry[] =
-  generated.snakeEntries && generated.snakeEntries.length > 0
-    ? generated.snakeEntries
-    : fallbackSnakeEntries;
+const mergedSnakeEntries = entriesForKey("snakeEntries");
 
-export const tetrisLiteEntries: GameEntry[] = generated.tetrisLiteEntries ?? [];
-export const breakoutEntries: GameEntry[] = generated.breakoutEntries ?? [];
-export const sokobanEntries: GameEntry[] = generated.sokobanEntries ?? [];
-export const pongEntries: GameEntry[] = generated.pongEntries ?? [];
+export const snakeEntries: GameEntry[] =
+  mergedSnakeEntries.length > 0 ? mergedSnakeEntries : fallbackSnakeEntries;
+
+export const tetrisLiteEntries: GameEntry[] = entriesForKey("tetrisLiteEntries");
+export const breakoutEntries: GameEntry[] = entriesForKey("breakoutEntries");
 
 export const entriesByGame: Record<GameSlug, GameEntry[]> = {
   snake: snakeEntries,
-  "tetris-lite": tetrisLiteEntries,
-  breakout: breakoutEntries,
-  sokoban: sokobanEntries,
-  pong: pongEntries
+  tetris: tetrisLiteEntries,
+  breakout: breakoutEntries
 };
 
 export const allEntries = gameDefinitions.flatMap((game) => entriesByGame[game.slug]);
