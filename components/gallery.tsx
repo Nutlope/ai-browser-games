@@ -10,6 +10,14 @@ type GalleryProps = {
   stats: { costMin: number; costMax: number };
 };
 
+/** Cheapest cost among a game's runs, used as the per-game comparison baseline. */
+function gameCheapest(runs: Run[]) {
+  const costs = runs
+    .map((run) => run.generationCostUsd)
+    .filter((value): value is number => value != null);
+  return costs.length ? Math.min(...costs) : 0;
+}
+
 export function Gallery({ runs, stats }: GalleryProps) {
   const flipRef = useFlip<HTMLDivElement>(runs.map((r) => r.id).join(","));
 
@@ -40,7 +48,13 @@ export function Gallery({ runs, stats }: GalleryProps) {
             </div>
             <div className={styles.grid}>
               {chapterRuns.map((run, runIndex) => (
-                <RunCard key={run.id} run={run} stats={stats} index={runIndex} />
+                <RunCard
+                  key={run.id}
+                  run={run}
+                  stats={stats}
+                  gameCheapest={gameCheapest(chapterRuns)}
+                  index={runIndex}
+                />
               ))}
             </div>
           </section>

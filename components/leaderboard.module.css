@@ -67,6 +67,10 @@
   white-space: nowrap;
 }
 
+.table thead th.num {
+  text-align: right;
+}
+
 .rankCol {
   width: 44px;
   text-align: right !important;

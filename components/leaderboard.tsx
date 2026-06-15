@@ -36,9 +36,6 @@ export function Leaderboard({ models }: { models: ModelSummary[] }) {
               <th className={styles.num} scope="col">
                 Total tokens
               </th>
-              <th className={styles.num} scope="col">
-                Games
-              </th>
             </tr>
           </thead>
           <tbody>
@@ -63,7 +60,6 @@ export function Leaderboard({ models }: { models: ModelSummary[] }) {
                   </span>
                 </td>
                 <td className={`${styles.num} tnum`}>{formatTokens(model.totalTokens)}</td>
-                <td className={`${styles.num} tnum`}>{model.games}</td>
               </tr>
             ))}
           </tbody>

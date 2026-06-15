@@ -171,6 +171,17 @@
   color: var(--text-muted);
 }
 
+.compare {
+  margin: 7px 0 10px;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text-soft);
+}
+
+.compare[data-cheapest="true"] {
+  color: var(--ink);
+}
+
 .tokens {
   margin-top: 9px;
   font-size: 12px;

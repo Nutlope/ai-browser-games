@@ -5,8 +5,9 @@ import { useEffect } from "react";
 /**
  * The first downward scroll from the very top smoothly glides the page to the
  * target section (the filters + gallery), then releases so all subsequent
- * scrolling is native. Inspired by hero -> content "first scroll" transitions.
- * Triggers once per page load and is disabled under prefers-reduced-motion.
+ * scrolling is native. Triggers once per page load, is disabled under
+ * prefers-reduced-motion, and yields immediately to ANY user input so it can
+ * never get stuck blocking scrolling or clicks.
  */
 export function FirstScrollGlide({ targetId }: { targetId: string }) {
   useEffect(() => {
@@ -18,13 +19,16 @@ export function FirstScrollGlide({ targetId }: { targetId: string }) {
     let triggered = false;
     let animating = false;
     let rafId = 0;
+    let safetyId = 0;
 
     const easeInOutCubic = (t: number) =>
       t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
 
     const cancel = () => {
       if (rafId) cancelAnimationFrame(rafId);
+      if (safetyId) window.clearTimeout(safetyId);
       rafId = 0;
+      safetyId = 0;
       animating = false;
     };
 
@@ -39,8 +43,11 @@ export function FirstScrollGlide({ targetId }: { targetId: string }) {
       const duration = 900;
       let start: number | undefined;
       animating = true;
+      // Hard safety: never stay in the animating state.
+      safetyId = window.setTimeout(cancel, duration + 500);
 
       const step = (ts: number) => {
+        if (!animating) return;
         if (start === undefined) start = ts;
         const p = Math.min(1, (ts - start) / duration);
         window.scrollTo(0, from + dist * easeInOutCubic(p));
@@ -55,9 +62,9 @@ export function FirstScrollGlide({ targetId }: { targetId: string }) {
     };
 
     const onWheel = (event: WheelEvent) => {
+      // Any scroll during the glide yields control back to the user immediately.
       if (animating) {
-        if (event.deltaY < 0) cancel();
-        else event.preventDefault();
+        cancel();
         return;
       }
       if (triggered) return;
@@ -78,7 +85,7 @@ export function FirstScrollGlide({ targetId }: { targetId: string }) {
     };
     const onTouchMove = (event: TouchEvent) => {
       if (animating) {
-        event.preventDefault();
+        cancel();
         return;
       }
       if (triggered || touchY == null) return;
@@ -94,17 +101,24 @@ export function FirstScrollGlide({ targetId }: { targetId: string }) {
       }
     };
 
-    // Only wheel and touch trigger the glide; keyboard scroll keys are never
-    // hijacked (so a keyboard user pressing Space/PageDown keeps native behavior).
+    // A click or keypress during the glide also cancels it.
+    const onInterrupt = () => {
+      if (animating) cancel();
+    };
+
     window.addEventListener("wheel", onWheel, { passive: false });
     window.addEventListener("touchstart", onTouchStart, { passive: true });
     window.addEventListener("touchmove", onTouchMove, { passive: false });
+    window.addEventListener("pointerdown", onInterrupt, { passive: true });
+    window.addEventListener("keydown", onInterrupt, { passive: true });
 
     return () => {
       cancel();
       window.removeEventListener("wheel", onWheel);
       window.removeEventListener("touchstart", onTouchStart);
       window.removeEventListener("touchmove", onTouchMove);
+      window.removeEventListener("pointerdown", onInterrupt);
+      window.removeEventListener("keydown", onInterrupt);
     };
   }, [targetId]);
 

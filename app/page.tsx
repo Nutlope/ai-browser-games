@@ -14,8 +14,13 @@ import {
   getRunLeaders,
   getRunStats
 } from "@/lib/games";
-import { formatCost, formatMultiple, formatTokens } from "@/lib/format";
+import { formatCost, formatMultiple } from "@/lib/format";
 import styles from "./page.module.css";
+
+// Render on demand so URL filter/sort state (useSearchParams) is resolved on the
+// server and the interactive Explorer ships in the HTML, instead of being
+// deferred to a client-only render that can briefly leave controls unclickable.
+export const dynamic = "force-dynamic";
 
 export default function HomePage() {
   const runs = getAllRuns();
@@ -57,15 +62,6 @@ export default function HomePage() {
       detail: "Priciest vs cheapest",
       makers: makerIds(leaders.priciest, leaders.cheapest),
       href: undefined
-    },
-    {
-      label: "Most tokens",
-      value: formatTokens(leaders.mostTokens?.totalTokens),
-      detail: leaders.mostTokens
-        ? `${leaders.mostTokens.label} · ${leaders.mostTokens.game}`
-        : "No runs yet",
-      makers: makerIds(leaders.mostTokens),
-      href: "/?sort=tokens#explore"
     }
   ];
 
@@ -116,11 +112,11 @@ export default function HomePage() {
           })}
         </section>
 
-        <Leaderboard models={models} />
-
         <Suspense fallback={null}>
           <Explorer runs={runs} stats={stats} />
         </Suspense>
+
+        <Leaderboard models={models} />
       </main>
 
       <SiteFooter />

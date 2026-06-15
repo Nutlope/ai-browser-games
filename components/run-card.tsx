@@ -4,18 +4,28 @@ import Link from "next/link";
 import { GameFrame } from "@/components/game-frame";
 import { MakerLogo } from "@/components/logos";
 import { MagnitudeBar } from "@/components/magnitude-bar";
-import { formatCost, formatTokens } from "@/lib/format";
+import { formatCost, formatMultiple, formatTokens } from "@/lib/format";
 import type { Run } from "@/lib/games";
 import styles from "./run-card.module.css";
 
 type RunCardProps = {
   run: Run;
   stats: { costMin: number; costMax: number };
+  gameCheapest: number;
   index?: number;
 };
 
-export function RunCard({ run, stats, index = 0 }: RunCardProps) {
+export function RunCard({ run, stats, gameCheapest, index = 0 }: RunCardProps) {
   const maker = run.maker;
+
+  const cost = run.generationCostUsd;
+  const isCheapest = cost != null && gameCheapest > 0 && cost <= gameCheapest * 1.0001;
+  const comparison =
+    cost == null || gameCheapest <= 0
+      ? null
+      : isCheapest
+        ? "Cheapest build"
+        : `${formatMultiple(cost, gameCheapest)} the cheapest`;
 
   return (
     <Link
@@ -62,6 +72,11 @@ export function RunCard({ run, stats, index = 0 }: RunCardProps) {
           <span className={`${styles.costValue} tnum`}>{formatCost(run.generationCostUsd)}</span>
           <span className={styles.costUnit}>USD/run</span>
         </div>
+        {comparison ? (
+          <p className={styles.compare} data-cheapest={isCheapest}>
+            {comparison}
+          </p>
+        ) : null}
         <MagnitudeBar
           value={run.generationCostUsd}
           min={stats.costMin}

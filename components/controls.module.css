@@ -164,3 +164,41 @@
   color: var(--text-muted);
   white-space: nowrap;
 }
+
+@media (max-width: 600px) {
+  /* Hide the "Sort" label, "Hide failed" toggle and result count so the
+     filters fit on one (horizontally scrollable) row; maker chips keep
+     their own row below. */
+  .sortLabel,
+  .failToggle,
+  .count {
+    display: none;
+  }
+
+  .row:first-child {
+    flex-wrap: nowrap;
+    justify-content: flex-start;
+    gap: 8px;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+  }
+
+  .row:first-child::-webkit-scrollbar {
+    display: none;
+  }
+
+  .right {
+    gap: 8px;
+    flex-wrap: nowrap;
+  }
+
+  .segment,
+  .sortGroup {
+    flex: none;
+  }
+
+  .seg {
+    padding: 6px 10px;
+  }
+}
