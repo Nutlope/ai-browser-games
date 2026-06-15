@@ -56,9 +56,8 @@ function prepareEntryForDisplay(entry: GameEntry): GameEntry {
     ...entry,
     game: entry.game === "Tetris-lite" ? "Tetris" : entry.game,
     html: prepareEmbeddedGameHtml(entry.html),
-    description: syntaxError
-      ? `${entry.description ?? ""} Generated script did not parse cleanly: ${syntaxError}`.trim()
-      : entry.description
+    broken: Boolean(syntaxError),
+    description: entry.description
   };
 }
 

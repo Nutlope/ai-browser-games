@@ -70,6 +70,10 @@ a.leader:hover {
   background: var(--wash);
 }
 
+a.leader:focus-visible {
+  outline-offset: -2px;
+}
+
 .leaderLabel {
   font-family: var(--font-mono);
   font-size: 10px;

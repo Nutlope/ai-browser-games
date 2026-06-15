@@ -12,6 +12,7 @@ export type ViewState = {
   sort: SortKey;
   dir: SortDir;
   view: ViewMode;
+  hideFailed: boolean;
 };
 
 export const DEFAULT_VIEW: ViewState = {
@@ -19,15 +20,24 @@ export const DEFAULT_VIEW: ViewState = {
   makers: [],
   sort: "cost",
   dir: "asc",
-  view: "gallery"
+  view: "gallery",
+  hideFailed: false
 };
 
-export function filterRuns(runs: Run[], game: GameFilter, makers: MakerId[]) {
+export function filterRuns(
+  runs: Run[],
+  game: GameFilter,
+  makers: MakerId[],
+  hideFailed = false
+) {
   return runs.filter((run) => {
     if (game !== "all" && run.gameSlug !== game) {
       return false;
     }
     if (makers.length > 0 && (!run.maker || !makers.includes(run.maker.id))) {
+      return false;
+    }
+    if (hideFailed && run.broken) {
       return false;
     }
     return true;

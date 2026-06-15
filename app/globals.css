@@ -87,9 +87,8 @@ textarea {
 }
 
 :focus-visible {
-  outline: none;
-  border-radius: 4px;
-  box-shadow: 0 0 0 2px var(--paper), 0 0 0 4px var(--g950);
+  outline: 2px solid var(--g950);
+  outline-offset: 2px;
 }
 
 /* Tabular figures everywhere numbers are mono. */

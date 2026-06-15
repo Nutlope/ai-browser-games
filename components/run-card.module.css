@@ -11,6 +11,10 @@
   background: var(--wash);
 }
 
+.card:focus-visible {
+  outline-offset: -2px;
+}
+
 @keyframes cardIn {
   from {
     opacity: 0;
@@ -77,6 +81,21 @@
 .card:focus-visible .playTag {
   opacity: 1;
   transform: none;
+}
+
+.brokenPill {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  padding: 3px 8px;
+  border-radius: 999px;
+  background: var(--paper);
+  border: 1px solid var(--hairline-strong);
+  color: var(--text-soft);
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
 }
 
 .caption {

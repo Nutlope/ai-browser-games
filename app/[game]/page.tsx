@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { RunPlayer } from "@/components/run-player";
@@ -19,6 +20,26 @@ type GamePageProps = {
 
 export function generateStaticParams() {
   return gameDefinitions.map((game) => ({ game: game.slug }));
+}
+
+export async function generateMetadata({ params }: GamePageProps): Promise<Metadata> {
+  const { game: slug } = await params;
+  const game = getGameDefinition(slug);
+
+  if (!game) {
+    return {};
+  }
+
+  return {
+    title: game.title,
+    description: game.description,
+    alternates: { canonical: `/${game.slug}` },
+    openGraph: {
+      title: `${game.title} · AI Browser Games`,
+      description: game.description,
+      url: `/${game.slug}`
+    }
+  };
 }
 
 export default async function GamePage({ params, searchParams }: GamePageProps) {

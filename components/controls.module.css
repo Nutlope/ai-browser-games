@@ -129,6 +129,36 @@
   filter: grayscale(1);
 }
 
+.rightMeta {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.failToggle {
+  padding: 5px 11px;
+  border: 1px solid var(--hairline);
+  border-radius: 999px;
+  background: transparent;
+  color: var(--text-soft);
+  font-size: 12px;
+  white-space: nowrap;
+  transition: background 0.15s var(--ease-out), color 0.15s var(--ease-out),
+    border-color 0.15s var(--ease-out);
+}
+
+.failToggle:hover {
+  color: var(--ink);
+  border-color: var(--hairline-strong);
+}
+
+.failToggle[data-on="true"] {
+  background: var(--ink);
+  color: var(--paper);
+  border-color: var(--ink);
+  font-weight: 500;
+}
+
 .count {
   font-size: 12px;
   color: var(--text-muted);

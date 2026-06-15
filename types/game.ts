@@ -12,4 +12,6 @@ export type GameEntry = {
   totalTokens?: number;
   generationCostUsd?: number;
   generatedAt?: string;
+  /** True when the generated HTML failed to parse/run (set during display prep). */
+  broken?: boolean;
 };

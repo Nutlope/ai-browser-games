@@ -41,10 +41,22 @@
   color: var(--ink);
 }
 
+.brokenTag {
+  padding: 3px 9px;
+  border: 1px solid var(--hairline-strong);
+  border-radius: 999px;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--text-soft);
+}
+
 .controls {
   margin-left: auto;
   display: inline-flex;
   gap: 6px;
+  flex-wrap: wrap;
 }
 
 .ctrl {

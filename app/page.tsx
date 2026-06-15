@@ -3,6 +3,7 @@ import Link from "next/link";
 import { Explorer } from "@/components/explorer";
 import { FirstScrollGlide } from "@/components/first-scroll-glide";
 import { HeroLogos } from "@/components/hero-logos";
+import { Leaderboard } from "@/components/leaderboard";
 import { MakerLogo } from "@/components/logos";
 import { SiteFooter } from "@/components/site-footer";
 import { SiteHeader } from "@/components/site-header";
@@ -114,6 +115,8 @@ export default function HomePage() {
             );
           })}
         </section>
+
+        <Leaderboard models={models} />
 
         <Suspense fallback={null}>
           <Explorer runs={runs} stats={stats} />

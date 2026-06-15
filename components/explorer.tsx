@@ -45,7 +45,8 @@ export function Explorer({ runs, stats }: ExplorerProps) {
       makers,
       sort: (sort === "tokens" ? "tokens" : "cost") as SortKey,
       dir: (dir === "desc" ? "desc" : "asc") as SortDir,
-      view: (view === "table" ? "table" : "gallery") as ViewMode
+      view: (view === "table" ? "table" : "gallery") as ViewMode,
+      hideFailed: params.get("failed") === "hide"
     };
   }, [params]);
 
@@ -58,6 +59,7 @@ export function Explorer({ runs, stats }: ExplorerProps) {
       if (next.sort !== DEFAULT_VIEW.sort) query.set("sort", next.sort);
       if (next.dir !== DEFAULT_VIEW.dir) query.set("dir", next.dir);
       if (next.view !== DEFAULT_VIEW.view) query.set("view", next.view);
+      if (next.hideFailed) query.set("failed", "hide");
 
       const qs = query.toString();
       router.replace(qs ? `${pathname}?${qs}` : pathname, { scroll: false });
@@ -84,10 +86,12 @@ export function Explorer({ runs, stats }: ExplorerProps) {
     return set;
   }, [runs]);
 
+  const hasFailed = useMemo(() => runs.some((run) => run.broken), [runs]);
+
   const visible = useMemo(() => {
-    const filtered = filterRuns(runs, state.game, state.makers);
+    const filtered = filterRuns(runs, state.game, state.makers, state.hideFailed);
     return sortRuns(filtered, state.sort, state.dir);
-  }, [runs, state.game, state.makers, state.sort, state.dir]);
+  }, [runs, state.game, state.makers, state.hideFailed, state.sort, state.dir]);
 
   return (
     <section id="explore" className={styles.explorer}>
@@ -95,6 +99,7 @@ export function Explorer({ runs, stats }: ExplorerProps) {
         state={state}
         resultCount={visible.length}
         availableMakers={availableMakers}
+        hasFailed={hasFailed}
         onChange={onChange}
       />
       <div className={styles.body}>

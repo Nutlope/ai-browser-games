@@ -2,11 +2,13 @@
   margin-top: 0;
   border: 1px solid var(--hairline);
   border-radius: var(--radius-lg);
-  overflow: hidden;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
 }
 
 .table {
   width: 100%;
+  min-width: 560px;
   border-collapse: collapse;
   font-size: 13px;
 }
@@ -116,6 +118,20 @@
 
 .model {
   font-weight: 500;
+}
+
+.failed {
+  margin-left: 8px;
+  padding: 1px 6px;
+  border: 1px solid var(--hairline-strong);
+  border-radius: 999px;
+  font-family: var(--font-mono);
+  font-size: 9px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  font-weight: 400;
+  color: var(--text-muted);
+  vertical-align: middle;
 }
 
 .maker {

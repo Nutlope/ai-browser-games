@@ -44,6 +44,7 @@ export function RunCard({ run, stats, index = 0 }: RunCardProps) {
             <path d="M8 5v14l11-7z" fill="currentColor" />
           </svg>
         </span>
+        {run.broken ? <span className={styles.brokenPill}>Failed to run</span> : null}
       </div>
 
       <div className={styles.caption}>

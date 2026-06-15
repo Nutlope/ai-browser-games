@@ -12,6 +12,8 @@ export function FirstScrollGlide({ targetId }: { targetId: string }) {
   useEffect(() => {
     if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
     if (window.scrollY > 8) return;
+    // Don't hijack when arriving at an in-page anchor (e.g. #explore on back-nav).
+    if (window.location.hash) return;
 
     let triggered = false;
     let animating = false;
@@ -92,30 +94,17 @@ export function FirstScrollGlide({ targetId }: { targetId: string }) {
       }
     };
 
-    const onKey = (event: KeyboardEvent) => {
-      if (triggered || animating) return;
-      if (window.scrollY > 8) {
-        triggered = true;
-        return;
-      }
-      if (["PageDown", "ArrowDown", " ", "Spacebar"].includes(event.key)) {
-        event.preventDefault();
-        triggered = true;
-        glide();
-      }
-    };
-
+    // Only wheel and touch trigger the glide; keyboard scroll keys are never
+    // hijacked (so a keyboard user pressing Space/PageDown keeps native behavior).
     window.addEventListener("wheel", onWheel, { passive: false });
     window.addEventListener("touchstart", onTouchStart, { passive: true });
     window.addEventListener("touchmove", onTouchMove, { passive: false });
-    window.addEventListener("keydown", onKey);
 
     return () => {
       cancel();
       window.removeEventListener("wheel", onWheel);
       window.removeEventListener("touchstart", onTouchStart);
       window.removeEventListener("touchmove", onTouchMove);
-      window.removeEventListener("keydown", onKey);
     };
   }, [targetId]);
 

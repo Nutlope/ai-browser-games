@@ -41,6 +41,9 @@ export function RunPlayer({ runs, initialId }: RunPlayerProps) {
 
   const selected = runs.find((run) => run.id === selectedId) ?? runs[0];
 
+  const [copied, setCopied] = useState(false);
+  const [coarsePointer, setCoarsePointer] = useState(false);
+
   const select = useCallback(
     (id: string) => {
       setSelectedId(id);
@@ -49,6 +52,20 @@ export function RunPlayer({ runs, initialId }: RunPlayerProps) {
     },
     [router, pathname]
   );
+
+  const copyLink = useCallback(() => {
+    navigator.clipboard
+      ?.writeText(window.location.href)
+      .then(() => {
+        setCopied(true);
+        window.setTimeout(() => setCopied(false), 1400);
+      })
+      .catch(() => {});
+  }, []);
+
+  useEffect(() => {
+    setCoarsePointer(window.matchMedia("(pointer: coarse)").matches);
+  }, []);
 
   // Stop the page from scrolling when game keys are pressed while the game frame is focused.
   useEffect(() => {
@@ -84,7 +101,11 @@ export function RunPlayer({ runs, initialId }: RunPlayerProps) {
               </span>
               {selected.label}
             </span>
+            {selected.broken ? <span className={styles.brokenTag}>Failed to run</span> : null}
             <span className={styles.controls}>
+              <button type="button" className={styles.ctrl} onClick={copyLink}>
+                {copied ? "Copied" : "Copy link"}
+              </button>
               <button type="button" className={styles.ctrl} onClick={restart}>
                 Restart
               </button>
@@ -103,7 +124,9 @@ export function RunPlayer({ runs, initialId }: RunPlayerProps) {
             />
           </div>
           <p className={styles.hint}>
-            Click the game to play. Arrow keys and WASD are captured while it is focused.
+            {coarsePointer
+              ? "These games are built for desktop play with a keyboard."
+              : "Click the game to play. Arrow keys and WASD are captured while it is focused."}
           </p>
         </div>
 

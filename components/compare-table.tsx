@@ -88,10 +88,18 @@ export function CompareTable({ runs, stats, sort, dir, onSort }: CompareTablePro
               Model
             </th>
             <th scope="col">Game</th>
-            <th className={styles.thNum} scope="col">
+            <th
+              className={styles.thNum}
+              scope="col"
+              aria-sort={sort === "cost" ? (dir === "asc" ? "ascending" : "descending") : "none"}
+            >
               {sortableHead("cost", "Cost")}
             </th>
-            <th className={styles.thNum} scope="col">
+            <th
+              className={styles.thNum}
+              scope="col"
+              aria-sort={sort === "tokens" ? (dir === "asc" ? "ascending" : "descending") : "none"}
+            >
               {sortableHead("tokens", "Total")}
             </th>
             <th className={styles.thNum} scope="col">
@@ -124,7 +132,10 @@ export function CompareTable({ runs, stats, sort, dir, onSort }: CompareTablePro
                     {run.maker ? <MakerLogo maker={run.maker.id} size={16} /> : null}
                   </span>
                   <span className={styles.names}>
-                    <span className={styles.model}>{run.label}</span>
+                    <span className={styles.model}>
+                      {run.label}
+                      {run.broken ? <span className={styles.failed}>failed</span> : null}
+                    </span>
                     <span className={styles.maker}>{run.maker?.name ?? "Unknown"}</span>
                   </span>
                 </a>
