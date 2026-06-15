@@ -27,10 +27,10 @@ const SLOTS: Slot[] = [
   { left: "10%", top: "37%", dir: -1, cardV: "bottom", cardH: "start" },
   { left: "18%", top: "63%", dir: -1, cardV: "top", cardH: "start" },
   { left: "8%", top: "85%", dir: -1, cardV: "top", cardH: "start" },
-  { left: "82%", top: "15%", dir: 1, cardV: "bottom", cardH: "end" },
-  { left: "92%", top: "35%", dir: 1, cardV: "bottom", cardH: "end" },
-  { left: "96%", top: "62%", dir: 1, cardV: "top", cardH: "end" },
-  { left: "94%", top: "85%", dir: 1, cardV: "top", cardH: "end" }
+  { left: "80%", top: "15%", dir: 1, cardV: "bottom", cardH: "end" },
+  { left: "90%", top: "37%", dir: 1, cardV: "bottom", cardH: "end" },
+  { left: "82%", top: "63%", dir: 1, cardV: "top", cardH: "end" },
+  { left: "92%", top: "85%", dir: 1, cardV: "top", cardH: "end" }
 ];
 
 export function HeroLogos({ models }: { models: ModelSummary[] }) {
