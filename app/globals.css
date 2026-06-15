@@ -1,42 +1,44 @@
-/* Hallmark · pre-emit critique: P5 H5 E4 S5 R4 V5 */
-/* Hallmark · macrostructure: Stat-Led Workbench · theme: Hum · audience: AI-game comparers · use: compare playable outputs by tokens and cost · tone: playful-exact */
 :root {
-  --bg: oklch(97% 0.012 95);
-  --bg-strong: oklch(94% 0.016 95);
-  --surface: oklch(99% 0.006 95);
-  --surface-strong: oklch(91% 0.02 95);
-  --surface-raised: oklch(100% 0 0);
-  --surface-tint: oklch(86% 0.18 95 / 0.34);
-  --border: oklch(76% 0.035 82);
-  --border-strong: oklch(55% 0.052 78);
-  --text: oklch(20% 0.012 250);
-  --text-soft: oklch(39% 0.026 250);
-  --text-muted: oklch(56% 0.035 250);
-  --accent: oklch(86% 0.18 95);
-  --accent-strong: oklch(49% 0.13 95);
-  --accent-deep: oklch(69% 0.17 92);
-  --accent-cool: oklch(66% 0.18 235);
-  --accent-cool-soft: oklch(91% 0.055 220);
-  --accent-warm: oklch(68% 0.24 18);
-  --accent-warm-soft: oklch(94% 0.055 25);
-  --accent-mint: oklch(80% 0.16 150);
-  --accent-lavender: oklch(74% 0.16 305);
-  --danger: var(--accent-warm);
-  --grid-line: oklch(72% 0.036 95 / 0.42);
-  --shadow: 0 30px 70px -32px oklch(20% 0.012 250 / 0.36);
-  --shadow-tight: 0 18px 36px -24px oklch(20% 0.012 250 / 0.28);
-  --font-display: "Plus Jakarta Sans", "Arial Rounded MT Bold", "Aptos", system-ui, sans-serif;
-  --font-body: "Plus Jakarta Sans", "Aptos", system-ui, sans-serif;
-  --font-mono: "JetBrains Mono", "SFMono-Regular", "Cascadia Code", monospace;
-  --radius-sm: 12px;
-  --radius-md: 16px;
-  --radius-lg: 20px;
-  --radius-pill: 999px;
-  --btn-edge: var(--accent-deep);
-  --btn-cast: oklch(76% 0.2 95 / 0.45);
-  --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
-  --ease-snap: cubic-bezier(0.22, 1, 0.36, 1);
+  /* Monochrome system. The only color on the site comes from the games
+     themselves and the maker logos on hover. Chrome stays strictly neutral. */
+  --paper: #ffffff;
+  --ink: #0a0a0a;
+
+  --g50: #fafafa;
+  --g100: #f4f4f5;
+  --g200: #eaeaea;
+  --g300: #e4e4e7;
+  --g400: #d4d4d8;
+  --g500: #a1a1aa;
+  --g600: #71717a;
+  --g700: #52525b;
+  --g800: #3f3f46;
+  --g900: #27272a;
+  --g950: #18181b;
+
+  --text: var(--ink);
+  --text-soft: var(--g600);
+  --text-muted: var(--g500);
+
+  --hairline: rgba(10, 10, 10, 0.08);
+  --hairline-strong: rgba(10, 10, 10, 0.14);
+  --wash: rgba(10, 10, 10, 0.04);
+  --wash-strong: rgba(10, 10, 10, 0.06);
+
+  --bar-track: var(--g100);
+  --bar-fill: var(--g900);
+
+  --radius-sm: 8px;
+  --radius-md: 10px;
+  --radius-lg: 14px;
+
   --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-snap: cubic-bezier(0.22, 1, 0.36, 1);
+
+  --maxw: 1200px;
+
+  --font-sans: var(--font-geist-sans), system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-mono: var(--font-geist-mono), "SFMono-Regular", "Cascadia Code", ui-monospace, monospace;
 }
 
 * {
@@ -45,24 +47,20 @@
 
 html {
   min-height: 100%;
-  overflow-x: clip;
-  background:
-    linear-gradient(90deg, var(--grid-line) 1px, transparent 1px),
-    linear-gradient(180deg, var(--grid-line) 1px, transparent 1px),
-    linear-gradient(110deg, oklch(100% 0 0 / 0.5), var(--accent-cool-soft) 140%),
-    var(--bg);
-  background-size: 72px 72px, 72px 72px, auto, auto;
+  -webkit-text-size-adjust: 100%;
 }
 
 body {
   margin: 0;
   min-height: 100vh;
-  overflow-x: clip;
   color: var(--text);
-  font-family: var(--font-body);
-  background:
-    linear-gradient(180deg, oklch(100% 0 0 / 0.32), transparent 18rem);
-  text-rendering: geometricPrecision;
+  background: var(--paper);
+  font-family: var(--font-sans);
+  font-size: 16px;
+  line-height: 1.5;
+  overflow-x: clip;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
 }
 
 a {
@@ -70,30 +68,43 @@ a {
   text-decoration: none;
 }
 
+button {
+  font: inherit;
+  color: inherit;
+  cursor: pointer;
+}
+
 button,
 input,
-textarea,
-select {
+select,
+textarea {
   font: inherit;
 }
 
 ::selection {
-  color: var(--bg);
-  background: var(--accent);
+  background: var(--ink);
+  color: var(--paper);
 }
 
 :focus-visible {
-  outline: 3px solid var(--accent-cool);
-  outline-offset: 3px;
+  outline: none;
+  border-radius: 4px;
+  box-shadow: 0 0 0 2px var(--paper), 0 0 0 4px var(--g950);
+}
+
+/* Tabular figures everywhere numbers are mono. */
+.tnum {
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
 }
 
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,
   *::after {
-    animation-duration: 1ms !important;
+    animation-duration: 0.001ms !important;
     animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
     scroll-behavior: auto !important;
-    transition-duration: 1ms !important;
   }
 }

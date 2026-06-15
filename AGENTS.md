@@ -24,12 +24,17 @@ Generation commands require API keys:
 
 ## Important Files
 
-- `app/page.tsx`: Home page with aggregate cost and token comparisons.
-- `app/snake/page.tsx`: Dedicated Snake comparison route.
-- `app/[game]/page.tsx`: Dynamic comparison route for non-Snake games.
-- `components/comparison-page.tsx`: Shared comparison page UI.
-- `components/game-tile.tsx`: Individual playable iframe tile.
-- `lib/games.ts`: Game definitions, generated data merging, sorting, and display preparation.
+- `app/page.tsx`: Home page (hero, leader strip, gallery/table explorer).
+- `app/[game]/page.tsx`: Unified focused play route for all games (`/[game]?model=<id>`).
+- `app/globals.css`: Monochrome design tokens; consume only `var(--token)` in CSS modules.
+- `components/explorer.tsx`: Owns URL filter/sort/view state.
+- `components/gallery.tsx`, `components/run-card.tsx`: Game-grouped gallery and browse tiles.
+- `components/compare-table.tsx`: Sortable table view.
+- `components/run-player.tsx`: Inline player and same-game model-swap rail.
+- `components/logos.tsx`: Single-color maker logos and the `MakerLogo` dispatcher.
+- `lib/games.ts`: Game definitions, data merging, and run/stats/leader helpers.
+- `lib/makers.ts`: Maps `sourceModelId` namespace to the real maker company.
+- `lib/format.ts`, `lib/runs-view.ts`: Number formatting and filter/sort logic.
 - `lib/game-html.ts`: Embedded HTML preparation and generated syntax checks.
 - `scripts/generate-games.mjs`: Together generation script.
 - `scripts/generate-openrouter-games.mjs`: OpenRouter generation script.
@@ -37,9 +42,13 @@ Generation commands require API keys:
 
 ## Development Notes
 
-- Preserve the existing CSS Modules approach. Do not introduce a styling framework unless explicitly requested.
+- The site is strictly monochrome. Color comes only from the game iframes and maker logos (grayscale at rest, brand color on hover). Do not introduce hued chrome.
+- Preserve the existing CSS Modules approach and the design tokens in `app/globals.css`. Do not introduce a styling framework unless explicitly requested.
+- Identify models by the maker logo from `lib/makers.ts` (derived from `sourceModelId`); never display the `provider` routing platform.
+- There is no generation-duration field in the data, so never show a time, speed, or latency figure. Runs compare by cost and tokens only.
 - Keep game entries self-contained. Generated HTML should not require external assets, fonts, libraries, or network requests.
 - When changing the generated data shape, update `types/game.ts`, `lib/games.ts`, and both generator scripts together.
+- When adding a model from a new company, add its maker mapping in `lib/makers.ts` and a single-color logo in `components/logos.tsx`.
 - When adding a new game, update `gameDefinitions`, `entriesByGame`, both generator prompt lists, and routing expectations.
 - Keep generated JSON files valid, formatted with two-space indentation, and committed when benchmark data changes.
 - Avoid editing `tsconfig.tsbuildinfo`; it is a build artifact.

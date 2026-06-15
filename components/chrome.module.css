@@ -1,0 +1,108 @@
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  height: 64px;
+}
+
+.brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 0;
+}
+
+.mark {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  height: 24px;
+  padding: 0 7px;
+  background: var(--ink);
+  color: var(--paper);
+  border-radius: 7px;
+  font-family: var(--font-mono);
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: 0.04em;
+  transition: transform 0.2s var(--ease-out);
+}
+
+.brand:hover .mark {
+  transform: rotate(-4deg);
+}
+
+.wordmark {
+  font-size: 15px;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  max-width: 0;
+  margin-left: 0;
+  opacity: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  transform: translateX(-4px);
+  transition: max-width 0.4s var(--ease-out), opacity 0.3s var(--ease-out),
+    margin-left 0.4s var(--ease-out), transform 0.4s var(--ease-out);
+}
+
+.brand:hover .wordmark,
+.brand:focus-visible .wordmark {
+  max-width: 16rem;
+  margin-left: 10px;
+  opacity: 1;
+  transform: none;
+}
+
+.headerRight {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+}
+
+.meta {
+  font-size: 11px;
+  color: var(--text-muted);
+  white-space: nowrap;
+}
+
+.gh {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-muted);
+  transition: color 0.15s var(--ease-out);
+}
+
+.gh:hover {
+  color: var(--ink);
+}
+
+.footer {
+  margin-top: 72px;
+  padding: 28px 0 48px;
+  border-top: 1px solid var(--hairline);
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.method {
+  margin: 0;
+  max-width: 64ch;
+  font-size: 13px;
+  line-height: 1.6;
+  color: var(--text-soft);
+}
+
+.attribution {
+  margin: 0;
+  font-size: 12px;
+  color: var(--text-muted);
+}
+
+@media (max-width: 560px) {
+  .meta {
+    display: none;
+  }
+}

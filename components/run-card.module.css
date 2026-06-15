@@ -1,0 +1,163 @@
+.card {
+  display: flex;
+  flex-direction: column;
+  background: var(--paper);
+  outline: 1px solid transparent;
+  transition: background 0.18s var(--ease-out);
+  animation: cardIn 0.5s var(--ease-out) both;
+}
+
+.card:hover {
+  background: var(--wash);
+}
+
+@keyframes cardIn {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+.media {
+  position: relative;
+  aspect-ratio: 1 / 1;
+  background: var(--g100);
+  overflow: hidden;
+}
+
+.poster {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  color: var(--g400);
+}
+
+.posterGlyph {
+  opacity: 0.8;
+}
+
+.preview {
+  position: absolute;
+  inset: 0;
+  filter: grayscale(1) contrast(0.92) brightness(1.02);
+  transition: filter 0.3s var(--ease-out);
+}
+
+.card:hover .preview,
+.card:focus-visible .preview {
+  filter: grayscale(0);
+}
+
+.playTag {
+  position: absolute;
+  left: 10px;
+  bottom: 10px;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 3px 8px;
+  border-radius: 999px;
+  background: rgba(10, 10, 10, 0.62);
+  color: #fff;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  opacity: 0;
+  transform: translateY(4px);
+  transition: opacity 0.18s var(--ease-out), transform 0.18s var(--ease-out);
+}
+
+.card:hover .playTag,
+.card:focus-visible .playTag {
+  opacity: 1;
+  transform: none;
+}
+
+.caption {
+  display: flex;
+  flex-direction: column;
+  padding: 13px 15px 15px;
+  border-top: 1px solid var(--hairline);
+}
+
+.identity {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 13px;
+}
+
+.logo {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 30px;
+  height: 30px;
+  flex: none;
+  border: 1px solid var(--hairline-strong);
+  border-radius: 7px;
+  color: var(--g700);
+  filter: grayscale(1);
+  transition: filter 0.2s var(--ease-out), color 0.2s var(--ease-out), border-color 0.2s var(--ease-out);
+}
+
+.card:hover .logo,
+.card:focus-visible .logo {
+  filter: grayscale(0);
+  color: var(--ink);
+  border-color: var(--hairline-strong);
+}
+
+.names {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.model {
+  font-size: 14px;
+  font-weight: 500;
+  letter-spacing: -0.01em;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.maker {
+  font-size: 11px;
+  color: var(--text-muted);
+}
+
+.cost {
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+}
+
+.costValue {
+  font-size: 18px;
+  font-weight: 500;
+  letter-spacing: -0.01em;
+}
+
+.costUnit {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  color: var(--text-muted);
+}
+
+.tokens {
+  margin-top: 9px;
+  font-size: 12px;
+  color: var(--text-soft);
+}
+
+.tokensSplit {
+  color: var(--text-muted);
+}

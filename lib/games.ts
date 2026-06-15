@@ -3,6 +3,7 @@ import {
   prepareEmbeddedGameHtml,
   snakeGameHtml
 } from "@/lib/game-html";
+import { makerFromSourceId, type Maker, type MakerId } from "@/lib/makers";
 import type { GameEntry } from "@/types/game";
 import generatedGames from "@/generated/games.json";
 import openrouterGames from "@/generated/openrouter-games.json";
@@ -157,4 +158,127 @@ export const allEntries = gameDefinitions.flatMap((game) => entriesByGame[game.s
 
 export function getGameDefinition(slug: string) {
   return gameDefinitions.find((game) => game.slug === slug);
+}
+
+/** A generated run enriched with its real maker and game slug, ready for display. */
+export type Run = GameEntry & {
+  maker: Maker | null;
+  gameSlug: GameSlug;
+};
+
+const GAME_NAME_TO_SLUG: Record<string, GameSlug> = {
+  Snake: "snake",
+  Tetris: "tetris",
+  Breakout: "breakout"
+};
+
+function toRun(entry: GameEntry, gameSlug: GameSlug): Run {
+  return {
+    ...entry,
+    gameSlug,
+    maker: makerFromSourceId(entry.sourceModelId)
+  };
+}
+
+export function getRunsByGame(): Record<GameSlug, Run[]> {
+  return {
+    snake: snakeEntries.map((entry) => toRun(entry, "snake")),
+    tetris: tetrisLiteEntries.map((entry) => toRun(entry, "tetris")),
+    breakout: breakoutEntries.map((entry) => toRun(entry, "breakout"))
+  };
+}
+
+export function getAllRuns(): Run[] {
+  const byGame = getRunsByGame();
+  return gameDefinitions.flatMap((game) => byGame[game.slug]);
+}
+
+export type RunStats = {
+  costMin: number;
+  costMax: number;
+  tokenMin: number;
+  tokenMax: number;
+};
+
+export function getRunStats(runs: Run[]): RunStats {
+  const costs = runs
+    .map((run) => run.generationCostUsd)
+    .filter((value): value is number => value != null);
+  const tokens = runs
+    .map((run) => run.totalTokens)
+    .filter((value): value is number => value != null);
+
+  return {
+    costMin: costs.length ? Math.min(...costs) : 0,
+    costMax: costs.length ? Math.max(...costs) : 0,
+    tokenMin: tokens.length ? Math.min(...tokens) : 0,
+    tokenMax: tokens.length ? Math.max(...tokens) : 0
+  };
+}
+
+export type RunLeaders = {
+  cheapest?: Run;
+  priciest?: Run;
+  mostTokens?: Run;
+  costSpread?: number;
+};
+
+export function getRunLeaders(runs: Run[]): RunLeaders {
+  const priced = runs.filter((run) => run.generationCostUsd != null);
+  const tokened = runs.filter((run) => run.totalTokens != null);
+
+  const cheapest = [...priced].sort(
+    (a, b) => (a.generationCostUsd ?? 0) - (b.generationCostUsd ?? 0)
+  )[0];
+  const priciest = [...priced].sort(
+    (a, b) => (b.generationCostUsd ?? 0) - (a.generationCostUsd ?? 0)
+  )[0];
+  const mostTokens = [...tokened].sort(
+    (a, b) => (b.totalTokens ?? 0) - (a.totalTokens ?? 0)
+  )[0];
+
+  const costSpread =
+    cheapest?.generationCostUsd && priciest?.generationCostUsd
+      ? priciest.generationCostUsd / cheapest.generationCostUsd
+      : undefined;
+
+  return { cheapest, priciest, mostTokens, costSpread };
+}
+
+/** One row per model, aggregated across its games. Used by the hero showcase. */
+export type ModelSummary = {
+  label: string;
+  makerId: MakerId | null;
+  makerName: string;
+  avgCost: number | null;
+  totalTokens: number;
+  games: number;
+};
+
+export function getModelSummaries(): ModelSummary[] {
+  const byModel = new Map<string, Run[]>();
+
+  for (const run of getAllRuns()) {
+    const list = byModel.get(run.label) ?? [];
+    list.push(run);
+    byModel.set(run.label, list);
+  }
+
+  return Array.from(byModel.values())
+    .map((list) => {
+      const costs = list
+        .map((run) => run.generationCostUsd)
+        .filter((value): value is number => value != null);
+      const maker = list[0].maker;
+
+      return {
+        label: list[0].label,
+        makerId: maker?.id ?? null,
+        makerName: maker?.name ?? "Unknown maker",
+        avgCost: costs.length ? costs.reduce((a, b) => a + b, 0) / costs.length : null,
+        totalTokens: list.reduce((sum, run) => sum + (run.totalTokens ?? 0), 0),
+        games: list.length
+      };
+    })
+    .sort((a, b) => (a.avgCost ?? Infinity) - (b.avgCost ?? Infinity));
 }

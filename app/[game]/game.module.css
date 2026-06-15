@@ -1,0 +1,47 @@
+.shell {
+  max-width: var(--maxw);
+  margin: 0 auto;
+  padding: 0 24px;
+}
+
+.chapterHead {
+  padding: 28px 0 24px;
+  margin-bottom: 8px;
+  border-bottom: 1px solid var(--hairline);
+}
+
+.back {
+  display: inline-block;
+  margin-bottom: 18px;
+  font-size: 13px;
+  color: var(--text-soft);
+  transition: color 0.15s var(--ease-out);
+}
+
+.back:hover {
+  color: var(--ink);
+}
+
+.eyebrow {
+  margin: 0 0 10px;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+
+.title {
+  margin: 0;
+  font-size: clamp(1.75rem, 3.2vw, 2.5rem);
+  font-weight: 600;
+  letter-spacing: -0.025em;
+}
+
+.description {
+  margin: 12px 0 0;
+  max-width: 60ch;
+  font-size: 0.9375rem;
+  line-height: 1.6;
+  color: var(--text-soft);
+}
