@@ -109,7 +109,7 @@ function HeroLogoNode({
     onHoverChange(value);
   };
 
-  const onMove = (event: React.PointerEvent<HTMLButtonElement>) => {
+  const onMove = (event: React.PointerEvent<HTMLDivElement>) => {
     if (reduce) return;
     const rect = event.currentTarget.getBoundingClientRect();
     mx.set(clamp((event.clientX - (rect.left + rect.width / 2)) * 0.4));
@@ -164,8 +164,7 @@ function HeroLogoNode({
               }
         }
       >
-        <motion.button
-          type="button"
+        <motion.div
           className={styles.chip}
           style={{ x: mx, y: my }}
           whileHover={{ scale: 1.16 }}
@@ -174,15 +173,12 @@ function HeroLogoNode({
           onPointerMove={onMove}
           onPointerLeave={reset}
           onHoverStart={() => setHover(true)}
-          onFocus={() => setHover(true)}
-          onBlur={reset}
           onClick={go}
-          aria-label={`${model.label} by ${model.makerName}. View its builds.`}
         >
           <span className={styles.chipLogo}>
             {model.makerId ? <MakerLogo maker={model.makerId} size={26} /> : null}
           </span>
-        </motion.button>
+        </motion.div>
 
         <AnimatePresence>
           {open ? (

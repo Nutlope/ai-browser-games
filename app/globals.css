@@ -17,8 +17,8 @@
   --g950: #18181b;
 
   --text: var(--ink);
-  --text-soft: var(--g600);
-  --text-muted: var(--g500);
+  --text-soft: var(--g700);
+  --text-muted: var(--g600);
 
   --hairline: rgba(10, 10, 10, 0.08);
   --hairline-strong: rgba(10, 10, 10, 0.14);
