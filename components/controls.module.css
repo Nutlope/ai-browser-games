@@ -166,11 +166,11 @@
 }
 
 @media (max-width: 600px) {
-  /* Hide the "Sort" label, "Hide failed" toggle and result count so the
-     filters fit on one (horizontally scrollable) row; maker chips keep
-     their own row below. */
+  /* Hide the "Sort" label and result count so the sort/view filters fit on
+     one (horizontally scrollable) row. The "Hide failed" toggle stays
+     reachable on the maker-chips row so phone users can dismiss a failed
+     build. */
   .sortLabel,
-  .failToggle,
   .count {
     display: none;
   }

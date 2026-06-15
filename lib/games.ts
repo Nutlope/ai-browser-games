@@ -223,8 +223,11 @@ export type RunLeaders = {
 };
 
 export function getRunLeaders(runs: Run[]): RunLeaders {
-  const priced = runs.filter((run) => run.generationCostUsd != null);
-  const tokened = runs.filter((run) => run.totalTokens != null);
+  // Leaders represent working builds only; a build that failed to run should
+  // never be crowned cheapest/priciest or used as a comparison baseline.
+  const working = runs.filter((run) => !run.broken);
+  const priced = working.filter((run) => run.generationCostUsd != null);
+  const tokened = working.filter((run) => run.totalTokens != null);
 
   const cheapest = [...priced].sort(
     (a, b) => (a.generationCostUsd ?? 0) - (b.generationCostUsd ?? 0)
@@ -265,7 +268,10 @@ export function getModelSummaries(): ModelSummary[] {
 
   return Array.from(byModel.values())
     .map((list) => {
+      // Average cost over working builds only, so a failed build can't make a
+      // model look artificially cheap on the leaderboard.
       const costs = list
+        .filter((run) => !run.broken)
         .map((run) => run.generationCostUsd)
         .filter((value): value is number => value != null);
       const maker = list[0].maker;

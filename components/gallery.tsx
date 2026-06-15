@@ -10,9 +10,10 @@ type GalleryProps = {
   stats: { costMin: number; costMax: number };
 };
 
-/** Cheapest cost among a game's runs, used as the per-game comparison baseline. */
+/** Cheapest cost among a game's WORKING runs, used as the comparison baseline. */
 function gameCheapest(runs: Run[]) {
   const costs = runs
+    .filter((run) => !run.broken)
     .map((run) => run.generationCostUsd)
     .filter((value): value is number => value != null);
   return costs.length ? Math.min(...costs) : 0;

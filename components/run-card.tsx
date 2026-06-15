@@ -19,9 +19,10 @@ export function RunCard({ run, stats, gameCheapest, index = 0 }: RunCardProps) {
   const maker = run.maker;
 
   const cost = run.generationCostUsd;
-  const isCheapest = cost != null && gameCheapest > 0 && cost <= gameCheapest * 1.0001;
+  const isCheapest =
+    !run.broken && cost != null && gameCheapest > 0 && cost <= gameCheapest * 1.0001;
   const comparison =
-    cost == null || gameCheapest <= 0
+    run.broken || cost == null || gameCheapest <= 0
       ? null
       : isCheapest
         ? "Cheapest build"

@@ -101,7 +101,7 @@ export default function HomePage() {
             );
 
             return card.href ? (
-              <Link key={card.label} href={card.href} className={styles.leader} scroll={false}>
+              <Link key={card.label} href={card.href} className={styles.leader}>
                 {inner}
               </Link>
             ) : (

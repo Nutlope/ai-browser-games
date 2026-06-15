@@ -66,7 +66,7 @@ export default async function GamePage({ params, searchParams }: GamePageProps) 
 
       <main>
         <section className={styles.chapterHead}>
-          <Link href={`/?game=${game.slug}#explore`} className={styles.back} scroll={false}>
+          <Link href={`/?game=${game.slug}#explore`} className={styles.back}>
             ← All builds
           </Link>
           <p className={styles.eyebrow}>

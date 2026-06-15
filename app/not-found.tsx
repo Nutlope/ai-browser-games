@@ -12,7 +12,7 @@ export default function NotFound() {
           <p className={styles.code}>404</p>
           <h1 className={styles.title}>This page does not exist.</h1>
           <p className={styles.text}>The game or page you are looking for is not here.</p>
-          <Link href="/#explore" className={styles.cta} scroll={false}>
+          <Link href="/#explore" className={styles.cta}>
             Browse the benchmarks →
           </Link>
         </div>
