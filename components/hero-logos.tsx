@@ -23,14 +23,14 @@ type Slot = {
 
 // Positioned in the side gutters, clustered near (but outside) the title column.
 const SLOTS: Slot[] = [
-  { left: "17%", top: "28%", dir: -1, cardV: "bottom", cardH: "start" },
-  { left: "24%", top: "72%", dir: -1, cardV: "top", cardH: "start" },
-  { left: "11%", top: "52%", dir: -1, cardV: "bottom", cardH: "start" },
-  { left: "27%", top: "10%", dir: -1, cardV: "bottom", cardH: "center" },
-  { left: "83%", top: "26%", dir: 1, cardV: "bottom", cardH: "end" },
-  { left: "76%", top: "70%", dir: 1, cardV: "top", cardH: "end" },
-  { left: "89%", top: "52%", dir: 1, cardV: "bottom", cardH: "end" },
-  { left: "73%", top: "9%", dir: 1, cardV: "bottom", cardH: "center" }
+  { left: "20%", top: "15%", dir: -1, cardV: "bottom", cardH: "start" },
+  { left: "10%", top: "37%", dir: -1, cardV: "bottom", cardH: "start" },
+  { left: "18%", top: "63%", dir: -1, cardV: "top", cardH: "start" },
+  { left: "8%", top: "85%", dir: -1, cardV: "top", cardH: "start" },
+  { left: "82%", top: "15%", dir: 1, cardV: "bottom", cardH: "end" },
+  { left: "92%", top: "35%", dir: 1, cardV: "bottom", cardH: "end" },
+  { left: "96%", top: "62%", dir: 1, cardV: "top", cardH: "end" },
+  { left: "94%", top: "85%", dir: 1, cardV: "top", cardH: "end" }
 ];
 
 export function HeroLogos({ models }: { models: ModelSummary[] }) {

@@ -1,7 +1,9 @@
 .layer {
   position: absolute;
   top: 0;
-  bottom: 0;
+  /* Extend below the hero so the lower logos can float down toward the
+     stat strip (the hero itself is content-height for balanced padding). */
+  bottom: -120px;
   left: 50%;
   width: 100vw;
   transform: translateX(-50%);
