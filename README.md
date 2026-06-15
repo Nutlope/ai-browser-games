@@ -71,20 +71,40 @@ The scripts write these files:
 
 Each generated entry includes the provider, model label, source model id, token counts, estimated USD cost, timestamp, description, and the generated single-file HTML.
 
+## Design
+
+The interface is intentionally monochrome (black, white, and grays only). All color comes from
+the games themselves and from each maker's logo, which sit grayscale at rest and light up on hover.
+The home page leads with a gallery grouped by game so every model's take on the same game can be
+compared side by side, with a one-toggle sortable table as an alternate view. A run is identified by
+its maker's real company logo (mapped from `sourceModelId`, never the routing platform) plus its
+generation cost and token counts.
+
 ## Project Structure
 
 ```text
 app/
-  page.tsx                Home dashboard and model cost overview
-  snake/page.tsx          Snake comparison page
-  [game]/page.tsx         Dynamic pages for Tetris and Breakout
+  page.tsx                Home: hero, leader strip, and the gallery/table explorer
+  [game]/page.tsx         Focused play page for one run (/[game]?model=<id>)
+  globals.css             Monochrome design tokens and base styles
+  layout.tsx              Geist + Geist Mono fonts and metadata
 components/
-  comparison-page.tsx     Shared game comparison layout
-  game-tile.tsx           Playable iframe tile for one generated run
+  explorer.tsx            Owns URL filter/sort/view state, switches gallery vs table
+  controls.tsx            Game, maker, sort, and view controls
+  gallery.tsx             Game-grouped chapters of run cards (with FLIP reorder)
+  run-card.tsx            One run as a poster-first browse tile (live preview on view)
+  compare-table.tsx       Sortable comparison table view
+  run-player.tsx          Inline player plus the same-game model-swap rail
+  logos.tsx               Single-color maker logos and the MakerLogo dispatcher
+  magnitude-bar.tsx       Colorless cost/token magnitude bar
+  site-header.tsx, site-footer.tsx
 generated/
   *.json                  Generated benchmark data and reports
 lib/
-  games.ts                Game definitions, data merging, display prep
+  games.ts                Game definitions, data merging, runs, stats, and leaders
+  makers.ts               sourceModelId namespace to real maker company mapping
+  format.ts               Cost, token, and multiple formatting helpers
+  runs-view.ts            Filter/sort logic and view-state types
   game-html.ts            Embedded HTML preparation and validation helpers
 scripts/
   generate-games.mjs      Together generation pipeline
@@ -96,7 +116,12 @@ types/
 ## Notes for Maintainers
 
 - `lib/games.ts` merges Together and OpenRouter output and normalizes entries for display.
-- The Snake route has a dedicated page, while Tetris and Breakout use the dynamic `[game]` route.
+- All three games use the unified dynamic `[game]` route; the home gallery groups them by game.
+- The maker logo is derived from `sourceModelId` in `lib/makers.ts`; the `provider` field (the
+  routing platform) is never shown. When adding a model from a new company, add its maker mapping
+  and a single-color logo in `components/logos.tsx`.
+- The dataset has no generation-duration field, so the UI never shows a time or speed figure; runs
+  are compared only by cost and token usage.
 - Generated HTML should be self-contained and must not depend on external assets, fonts, libraries, or network requests.
 - Keep generated JSON committed when refreshing benchmark data so the app can run without API keys.
 - Do not commit API keys or local environment files.

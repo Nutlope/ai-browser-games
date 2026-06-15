@@ -1,0 +1,145 @@
+.layer {
+  position: absolute;
+  top: 0;
+  /* Extend below the hero so the lower logos can float down toward the
+     stat strip (the hero itself is content-height for balanced padding). */
+  bottom: -120px;
+  left: 50%;
+  width: 100vw;
+  transform: translateX(-50%);
+  z-index: 1;
+  pointer-events: none;
+  overflow: visible;
+}
+
+.node {
+  position: absolute;
+  width: 58px;
+  height: 58px;
+  margin-left: -29px;
+  margin-top: -29px;
+  will-change: transform, opacity;
+}
+
+.floater {
+  position: relative;
+  width: 58px;
+  height: 58px;
+  will-change: transform;
+}
+
+.chip {
+  pointer-events: auto;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 58px;
+  height: 58px;
+  padding: 0;
+  border: 1px solid var(--hairline-strong);
+  border-radius: 16px;
+  background: var(--paper);
+  color: var(--g500);
+  box-shadow: 0 10px 24px -16px rgba(10, 10, 10, 0.4);
+  filter: grayscale(1);
+  transition: filter 0.25s var(--ease-out), color 0.25s var(--ease-out),
+    border-color 0.25s var(--ease-out), box-shadow 0.25s var(--ease-out);
+}
+
+.chip:hover,
+.chip:focus-visible {
+  filter: grayscale(0);
+  color: var(--ink);
+  border-color: var(--ink);
+  box-shadow: 0 20px 38px -18px rgba(10, 10, 10, 0.5);
+}
+
+.chipLogo {
+  display: inline-flex;
+}
+
+.card {
+  position: absolute;
+  width: 168px;
+  padding: 12px 14px;
+  border: 1px solid var(--hairline-strong);
+  border-radius: var(--radius-md);
+  background: var(--paper);
+  box-shadow: 0 18px 40px -20px rgba(10, 10, 10, 0.45);
+  pointer-events: none;
+  z-index: 5;
+  text-align: left;
+}
+
+.cardBottom {
+  top: calc(100% + 12px);
+}
+
+.cardTop {
+  bottom: calc(100% + 12px);
+}
+
+.cardCenter {
+  left: calc(50% - 84px);
+}
+
+.cardStart {
+  left: 0;
+}
+
+.cardEnd {
+  right: 0;
+}
+
+.cardModel {
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+}
+
+.cardMaker {
+  font-size: 11px;
+  color: var(--text-muted);
+  margin-bottom: 10px;
+}
+
+.cardPrice {
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+  padding-top: 10px;
+  border-top: 1px solid var(--hairline);
+}
+
+.cardValue {
+  font-size: 16px;
+  font-weight: 500;
+}
+
+.cardLabel {
+  font-family: var(--font-mono);
+  font-size: 9px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+
+.cardCompare {
+  margin-top: 5px;
+  font-size: 11px;
+  color: var(--text-soft);
+}
+
+.cardCta {
+  margin-top: 10px;
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--text-soft);
+}
+
+@media (max-width: 900px) {
+  .layer {
+    display: none;
+  }
+}

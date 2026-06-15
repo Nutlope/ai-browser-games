@@ -1,0 +1,15 @@
+.explorer {
+  /* Matches the hero's bottom padding so the stat strip has equal space
+     above and below it. */
+  margin-top: 52px;
+}
+
+.body {
+  margin-top: 32px;
+}
+
+@media (max-width: 820px) {
+  .explorer {
+    margin-top: 40px;
+  }
+}

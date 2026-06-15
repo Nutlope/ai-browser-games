@@ -1,0 +1,30 @@
+.track {
+  width: 100%;
+  height: 3px;
+  border-radius: 2px;
+  background: var(--bar-track);
+  overflow: hidden;
+}
+
+.fill {
+  height: 100%;
+  border-radius: 2px;
+  background: var(--bar-fill);
+  transform-origin: left center;
+  animation: barIn 0.7s var(--ease-out) both;
+}
+
+@keyframes barIn {
+  from {
+    transform: scaleX(0);
+  }
+  to {
+    transform: scaleX(1);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .fill {
+    animation: none;
+  }
+}
