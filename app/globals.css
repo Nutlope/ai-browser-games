@@ -48,11 +48,14 @@
 html {
   min-height: 100%;
   -webkit-text-size-adjust: 100%;
-  scroll-behavior: smooth;
 }
 
 #explore {
   scroll-margin-top: 8px;
+}
+
+#leaderboard {
+  scroll-margin-top: 16px;
 }
 
 body {

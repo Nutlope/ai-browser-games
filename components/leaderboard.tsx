@@ -17,7 +17,7 @@ export function Leaderboard({ models }: { models: ModelSummary[] }) {
   }
 
   return (
-    <section className={styles.section} aria-label="Models ranked by average cost">
+    <section id="leaderboard" className={styles.section} aria-label="Models ranked by average cost">
       <div className={styles.head}>
         <h2 className={styles.title}>Models by average cost</h2>
         <span className={styles.rule} />
