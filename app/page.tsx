@@ -1,7 +1,6 @@
 import { Suspense } from "react";
 import Link from "next/link";
 import { Explorer } from "@/components/explorer";
-import { FirstScrollGlide } from "@/components/first-scroll-glide";
 import { HeroLogos } from "@/components/hero-logos";
 import { Leaderboard } from "@/components/leaderboard";
 import { MakerLogo } from "@/components/logos";
@@ -67,7 +66,6 @@ export default function HomePage() {
 
   return (
     <div className={styles.shell}>
-      <FirstScrollGlide targetId="explore" />
       <SiteHeader />
 
       <main>
