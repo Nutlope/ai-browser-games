@@ -1,6 +1,6 @@
 import { MakerLogo } from "@/components/logos";
 import { MagnitudeBar } from "@/components/magnitude-bar";
-import { formatCost, formatTokens } from "@/lib/format";
+import { formatCost, formatMultiple, formatTokens } from "@/lib/format";
 import type { ModelSummary } from "@/lib/games";
 import styles from "./leaderboard.module.css";
 
@@ -10,6 +10,7 @@ export function Leaderboard({ models }: { models: ModelSummary[] }) {
     .filter((value): value is number => value != null);
   const min = costs.length ? Math.min(...costs) : 0;
   const max = costs.length ? Math.max(...costs) : 0;
+  const baseline = min > 0 ? min : null;
 
   if (models.length === 0) {
     return null;
@@ -32,6 +33,9 @@ export function Leaderboard({ models }: { models: ModelSummary[] }) {
               <th scope="col">Model</th>
               <th className={styles.num} scope="col">
                 Avg cost
+              </th>
+              <th className={styles.num} scope="col">
+                Vs cheapest
               </th>
               <th className={styles.num} scope="col">
                 Total tokens
@@ -58,6 +62,9 @@ export function Leaderboard({ models }: { models: ModelSummary[] }) {
                   <span className={styles.bar}>
                     <MagnitudeBar value={model.avgCost} min={min} max={max} />
                   </span>
+                </td>
+                <td className={`${styles.num} tnum`}>
+                  {model.avgCost != null && baseline ? formatMultiple(model.avgCost, baseline) : "--"}
                 </td>
                 <td className={`${styles.num} tnum`}>{formatTokens(model.totalTokens)}</td>
               </tr>

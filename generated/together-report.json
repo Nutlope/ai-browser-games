@@ -1,183 +1,60 @@
 {
   "provider": "Together",
-  "generatedAt": "2026-06-05T05:33:55.754Z",
-  "successCount": 24,
-  "failureCount": 1,
+  "generatedAt": "2026-06-15T20:09:30.065Z",
+  "mode": "incremental",
+  "addedModels": [
+    "MiniMaxAI/MiniMax-M3",
+    "moonshotai/Kimi-K2.7-Code"
+  ],
+  "removedModels": [
+    "MiniMaxAI/MiniMax-M2.7",
+    "moonshotai/Kimi-K2.6"
+  ],
+  "successCount": 6,
+  "failureCount": 0,
   "successes": [
     {
-      "model": "deepseek-ai/DeepSeek-V4-Pro",
+      "model": "MiniMaxAI/MiniMax-M3",
       "game": "Snake",
-      "outputTokens": 3336,
-      "totalTokens": 3480,
-      "costUsd": 0.014981
+      "outputTokens": 9204,
+      "totalTokens": 9461,
+      "costUsd": 0.011122
     },
     {
-      "model": "moonshotai/Kimi-K2.6",
+      "model": "moonshotai/Kimi-K2.7-Code",
       "game": "Snake",
-      "outputTokens": 4010,
-      "totalTokens": 4158,
-      "costUsd": 0.018223
+      "outputTokens": 2231,
+      "totalTokens": 2379,
+      "costUsd": 0.009065
     },
     {
-      "model": "MiniMaxAI/MiniMax-M2.7",
-      "game": "Snake",
-      "outputTokens": 3936,
-      "totalTokens": 4088,
-      "costUsd": 0.004769
-    },
-    {
-      "model": "zai-org/GLM-5.1",
-      "game": "Snake",
-      "outputTokens": 1755,
-      "totalTokens": 1896,
-      "costUsd": 0.007919
-    },
-    {
-      "model": "nvidia/nemotron-3-ultra-550b-a55b",
-      "game": "Snake",
-      "outputTokens": 1768,
-      "totalTokens": 1930,
-      "costUsd": 0.006462
-    },
-    {
-      "model": "deepseek-ai/DeepSeek-V4-Pro",
+      "model": "MiniMaxAI/MiniMax-M3",
       "game": "Tetris-lite",
-      "outputTokens": 3786,
-      "totalTokens": 3940,
-      "costUsd": 0.016982
+      "outputTokens": 17600,
+      "totalTokens": 17869,
+      "costUsd": 0.021201
     },
     {
-      "model": "moonshotai/Kimi-K2.6",
+      "model": "moonshotai/Kimi-K2.7-Code",
       "game": "Tetris-lite",
-      "outputTokens": 4429,
-      "totalTokens": 4588,
-      "costUsd": 0.020121
+      "outputTokens": 12921,
+      "totalTokens": 13080,
+      "costUsd": 0.051835
     },
     {
-      "model": "MiniMaxAI/MiniMax-M2.7",
-      "game": "Tetris-lite",
-      "outputTokens": 5454,
-      "totalTokens": 5618,
-      "costUsd": 0.006594
-    },
-    {
-      "model": "zai-org/GLM-5.1",
-      "game": "Tetris-lite",
-      "outputTokens": 4408,
-      "totalTokens": 4560,
-      "costUsd": 0.019608
-    },
-    {
-      "model": "nvidia/nemotron-3-ultra-550b-a55b",
-      "game": "Tetris-lite",
-      "outputTokens": 3662,
-      "totalTokens": 3836,
-      "costUsd": 0.013288
-    },
-    {
-      "model": "deepseek-ai/DeepSeek-V4-Pro",
+      "model": "MiniMaxAI/MiniMax-M3",
       "game": "Breakout",
-      "outputTokens": 4084,
-      "totalTokens": 4223,
-      "costUsd": 0.018262
+      "outputTokens": 4745,
+      "totalTokens": 4999,
+      "costUsd": 0.00577
     },
     {
-      "model": "moonshotai/Kimi-K2.6",
+      "model": "moonshotai/Kimi-K2.7-Code",
       "game": "Breakout",
-      "outputTokens": 4791,
-      "totalTokens": 4936,
-      "costUsd": 0.021733
-    },
-    {
-      "model": "MiniMaxAI/MiniMax-M2.7",
-      "game": "Breakout",
-      "outputTokens": 5602,
-      "totalTokens": 5751,
-      "costUsd": 0.006767
-    },
-    {
-      "model": "zai-org/GLM-5.1",
-      "game": "Breakout",
-      "outputTokens": 5898,
-      "totalTokens": 6036,
-      "costUsd": 0.026144
-    },
-    {
-      "model": "nvidia/nemotron-3-ultra-550b-a55b",
-      "game": "Breakout",
-      "outputTokens": 3394,
-      "totalTokens": 3552,
-      "costUsd": 0.012313
-    },
-    {
-      "model": "deepseek-ai/DeepSeek-V4-Pro",
-      "game": "Sokoban",
-      "outputTokens": 3554,
-      "totalTokens": 3701,
-      "costUsd": 0.015946
-    },
-    {
-      "model": "moonshotai/Kimi-K2.6",
-      "game": "Sokoban",
-      "outputTokens": 4899,
-      "totalTokens": 5052,
-      "costUsd": 0.022229
-    },
-    {
-      "model": "MiniMaxAI/MiniMax-M2.7",
-      "game": "Sokoban",
-      "outputTokens": 2828,
-      "totalTokens": 2985,
-      "costUsd": 0.003441
-    },
-    {
-      "model": "nvidia/nemotron-3-ultra-550b-a55b",
-      "game": "Sokoban",
-      "outputTokens": 2266,
-      "totalTokens": 2432,
-      "costUsd": 0.008257
-    },
-    {
-      "model": "deepseek-ai/DeepSeek-V4-Pro",
-      "game": "Pong",
-      "outputTokens": 3755,
-      "totalTokens": 3896,
-      "costUsd": 0.016818
-    },
-    {
-      "model": "moonshotai/Kimi-K2.6",
-      "game": "Pong",
-      "outputTokens": 5112,
-      "totalTokens": 5259,
-      "costUsd": 0.02318
-    },
-    {
-      "model": "MiniMaxAI/MiniMax-M2.7",
-      "game": "Pong",
-      "outputTokens": 3122,
-      "totalTokens": 3272,
-      "costUsd": 0.003791
-    },
-    {
-      "model": "zai-org/GLM-5.1",
-      "game": "Pong",
-      "outputTokens": 2152,
-      "totalTokens": 2292,
-      "costUsd": 0.009665
-    },
-    {
-      "model": "nvidia/nemotron-3-ultra-550b-a55b",
-      "game": "Pong",
-      "outputTokens": 2589,
-      "totalTokens": 2749,
-      "costUsd": 0.009416
+      "outputTokens": 4582,
+      "totalTokens": 4727,
+      "costUsd": 0.018466
     }
   ],
-  "failures": [
-    {
-      "model": "zai-org/GLM-5.1",
-      "game": "Sokoban",
-      "error": "Model returned an empty response."
-    }
-  ]
+  "failures": []
 }

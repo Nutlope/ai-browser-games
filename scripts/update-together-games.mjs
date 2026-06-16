@@ -1,4 +1,4 @@
-import { mkdir, writeFile } from "node:fs/promises";
+import { mkdir, readFile, writeFile } from "node:fs/promises";
 import path from "node:path";
 import process from "node:process";
 import { fileURLToPath } from "node:url";
@@ -16,42 +16,22 @@ const apiKey = process.env.TOGETHER_API_KEY;
 
 const models = [
   {
-    id: "deepseek-ai/DeepSeek-V4-Pro",
-    label: "DeepSeek V4 Pro",
+    id: "MiniMaxAI/MiniMax-M3",
+    label: "MiniMax M3",
     provider: "Together",
-    inputPricePerMillion: 2.1,
-    outputPricePerMillion: 4.4,
+    inputPricePerMillion: 0.3,
+    outputPricePerMillion: 1.2
   },
   {
     id: "moonshotai/Kimi-K2.7-Code",
     label: "Kimi K2.7 Code",
     provider: "Together",
     inputPricePerMillion: 0.95,
-    outputPricePerMillion: 4,
-  },
-  {
-    id: "MiniMaxAI/MiniMax-M3",
-    label: "MiniMax M3",
-    provider: "Together",
-    inputPricePerMillion: 0.3,
-    outputPricePerMillion: 1.2,
-  },
-  {
-    id: "zai-org/GLM-5.1",
-    label: "GLM 5.1",
-    provider: "Together",
-    inputPricePerMillion: 1.4,
-    outputPricePerMillion: 4.4,
-  },
-  {
-    id: "nvidia/nemotron-3-ultra-550b-a55b",
-    label: "Nemotron 3 Ultra 550B",
-    provider: "Together",
-    inputPricePerMillion: 0.60,
-    outputPricePerMillion: 3.60,
-  },
+    outputPricePerMillion: 4
+  }
 ];
 
+const removeModelIds = new Set(["MiniMaxAI/MiniMax-M2.7", "moonshotai/Kimi-K2.6"]);
 const promptVersion = "v2";
 
 const gamePrompts = [
@@ -69,8 +49,8 @@ const gamePrompts = [
       "- Include score, restart handling, and clear visual feedback.",
       "- Keep the design tasteful and minimal.",
       "- Keep the implementation compact and avoid unnecessary code or commentary.",
-      "- Do not depend on any external assets, fonts, libraries, or network requests.",
-    ].join("\n"),
+      "- Do not depend on any external assets, fonts, libraries, or network requests."
+    ].join("\n")
   },
   {
     key: "tetrisLiteEntries",
@@ -85,8 +65,8 @@ const gamePrompts = [
       "- Include falling tetromino-like pieces, collision handling, line clears, scoring, restart handling, and clear visual feedback.",
       "- Keep the design tasteful and minimal.",
       "- Keep the implementation compact and avoid unnecessary code or commentary.",
-      "- Do not depend on any external assets, fonts, libraries, or network requests.",
-    ].join("\n"),
+      "- Do not depend on any external assets, fonts, libraries, or network requests."
+    ].join("\n")
   },
   {
     key: "breakoutEntries",
@@ -101,16 +81,13 @@ const gamePrompts = [
       "- Include ball physics, brick collision, score, lives or restart handling, and clear visual feedback.",
       "- Keep the design tasteful and minimal.",
       "- Keep the implementation compact and avoid unnecessary code or commentary.",
-      "- Do not depend on any external assets, fonts, libraries, or network requests.",
-    ].join("\n"),
-  },
+      "- Do not depend on any external assets, fonts, libraries, or network requests."
+    ].join("\n")
+  }
 ];
 
 function slugify(value) {
-  return value
-    .toLowerCase()
-    .replace(/[^a-z0-9]+/g, "-")
-    .replace(/(^-|-$)/g, "");
+  return value.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "");
 }
 
 function extractTextContent(content) {
@@ -125,12 +102,7 @@ function extractTextContent(content) {
           return item;
         }
 
-        if (
-          item &&
-          typeof item === "object" &&
-          "text" in item &&
-          typeof item.text === "string"
-        ) {
+        if (item && typeof item === "object" && "text" in item && typeof item.text === "string") {
           return item.text;
         }
 
@@ -176,13 +148,43 @@ function computeCostUsd(usage, model) {
   return Number(cost.toFixed(6));
 }
 
+async function loadExistingOutput() {
+  const file = await readFile(outputPath, "utf8");
+  const parsed = JSON.parse(file);
+
+  return Object.fromEntries(
+    gamePrompts.map((gamePrompt) => [
+      gamePrompt.key,
+      Array.isArray(parsed[gamePrompt.key]) ? parsed[gamePrompt.key] : []
+    ])
+  );
+}
+
+function mergeEntries(existingEntries, nextEntries) {
+  const byId = new Map();
+
+  for (const entry of existingEntries) {
+    if (removeModelIds.has(entry.sourceModelId)) {
+      continue;
+    }
+
+    byId.set(entry.id, entry);
+  }
+
+  for (const entry of nextEntries) {
+    byId.set(entry.id, entry);
+  }
+
+  return Array.from(byId.values()).sort((left, right) => left.label.localeCompare(right.label));
+}
+
 async function createGame(model, gamePrompt) {
   const response = await fetch("https://api.together.xyz/v1/chat/completions", {
     method: "POST",
     signal: AbortSignal.timeout(REQUEST_TIMEOUT_MS),
     headers: {
       Authorization: `Bearer ${apiKey}`,
-      "Content-Type": "application/json",
+      "Content-Type": "application/json"
     },
     body: JSON.stringify({
       model: model.id,
@@ -192,14 +194,14 @@ async function createGame(model, gamePrompt) {
         {
           role: "system",
           content:
-            "You write concise, production-ready single-file browser games. Return only the HTML document.",
+            "You write concise, production-ready single-file browser games. Return only the HTML document."
         },
         {
           role: "user",
-          content: gamePrompt.prompt,
-        },
-      ],
-    }),
+          content: gamePrompt.prompt
+        }
+      ]
+    })
   });
 
   if (!response.ok) {
@@ -231,7 +233,7 @@ async function createGame(model, gamePrompt) {
     generationCostUsd: computeCostUsd(usage, model),
     generatedAt: new Date().toISOString(),
     description: `Generated via Together using ${model.id} (${promptVersion}).`,
-    html,
+    html
   };
 }
 
@@ -245,9 +247,7 @@ async function attemptCreateGame(model, gamePrompt, retries = 3) {
       lastError = error;
 
       if (attempt < retries) {
-        await new Promise((resolve) =>
-          setTimeout(resolve, 1200 * (attempt + 1)),
-        );
+        await new Promise((resolve) => setTimeout(resolve, 1200 * (attempt + 1)));
       }
     }
   }
@@ -257,29 +257,26 @@ async function attemptCreateGame(model, gamePrompt, retries = 3) {
 
 async function main() {
   if (!apiKey) {
-    console.error(
-      "Missing TOGETHER_API_KEY. Add it to your environment before running pnpm generate:games.",
-    );
+    console.error("Missing TOGETHER_API_KEY. Add it to your environment before running this script.");
     process.exit(1);
   }
 
-  const output = Object.fromEntries(
-    gamePrompts.map((gamePrompt) => [gamePrompt.key, []]),
-  );
+  const existing = await loadExistingOutput();
+  const generated = Object.fromEntries(gamePrompts.map((gamePrompt) => [gamePrompt.key, []]));
   const failures = [];
   const successes = [];
   let successCount = 0;
 
   for (const gamePrompt of gamePrompts) {
     process.stdout.write(
-      `Generating ${gamePrompt.game} for ${models.length} models in parallel...\n`,
+      `Generating ${gamePrompt.game} for ${models.length} Together models in parallel...\n`
     );
 
     const results = await Promise.allSettled(
       models.map(async (model) => {
         const entry = await attemptCreateGame(model, gamePrompt, 3);
         return { entry, model };
-      }),
+      })
     );
 
     results.forEach((result, index) => {
@@ -287,13 +284,13 @@ async function main() {
 
       if (result.status === "fulfilled") {
         const { entry } = result.value;
-        output[gamePrompt.key].push(entry);
+        generated[gamePrompt.key].push(entry);
         successes.push({
           model: model.id,
           game: gamePrompt.game,
           outputTokens: entry.outputTokens ?? null,
           totalTokens: entry.totalTokens ?? null,
-          costUsd: entry.generationCostUsd ?? null,
+          costUsd: entry.generationCostUsd ?? null
         });
         successCount += 1;
         return;
@@ -302,61 +299,54 @@ async function main() {
       failures.push({
         model: model.id,
         game: gamePrompt.game,
-        error:
-          result.reason instanceof Error
-            ? result.reason.message
-            : String(result.reason),
+        error: result.reason instanceof Error ? result.reason.message : String(result.reason)
       });
     });
   }
 
+  if (successCount === 0) {
+    throw new Error("No generations succeeded, so generated/games.json was left unchanged.");
+  }
+
+  const nextOutput = Object.fromEntries(
+    gamePrompts.map((gamePrompt) => [
+      gamePrompt.key,
+      mergeEntries(existing[gamePrompt.key], generated[gamePrompt.key])
+    ])
+  );
+
   await mkdir(outputDir, { recursive: true });
+  await writeFile(outputPath, JSON.stringify(nextOutput, null, 2) + "\n", "utf8");
   await writeFile(
     reportPath,
     JSON.stringify(
       {
         provider: "Together",
         generatedAt: new Date().toISOString(),
+        mode: "incremental",
+        addedModels: models.map((model) => model.id),
+        removedModels: Array.from(removeModelIds),
         successCount,
         failureCount: failures.length,
         successes,
-        failures,
+        failures
       },
       null,
-      2,
+      2
     ) + "\n",
-    "utf8",
+    "utf8"
   );
-
-  if (successCount === 0) {
-    throw new Error(
-      "No generations succeeded, so generated/games.json was left unchanged.",
-    );
-  }
-
-  const nextOutput = Object.fromEntries(
-    gamePrompts.map((gamePrompt) => [
-      gamePrompt.key,
-      output[gamePrompt.key].sort((left, right) =>
-        left.label.localeCompare(right.label),
-      ),
-    ]),
-  );
-
-  await writeFile(outputPath, JSON.stringify(nextOutput, null, 2) + "\n", "utf8");
 
   process.stdout.write(`Wrote ${outputPath}\n`);
 
   if (failures.length > 0) {
     process.stderr.write("Failed generations:\n");
     failures.forEach((failure) => {
-      process.stderr.write(
-        `- ${failure.model} / ${failure.game}: ${failure.error}\n`,
-      );
+      process.stderr.write(`- ${failure.model} / ${failure.game}: ${failure.error}\n`);
     });
     process.exitCode = 1;
   } else {
-    process.stdout.write("All generations succeeded.\n");
+    process.stdout.write("All incremental generations succeeded.\n");
   }
 }
 
