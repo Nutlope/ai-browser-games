@@ -1,4 +1,3 @@
-import { Suspense } from "react";
 import Link from "next/link";
 import { Explorer } from "@/components/explorer";
 import { HeroLogos } from "@/components/hero-logos";
@@ -110,9 +109,7 @@ export default function HomePage() {
           })}
         </section>
 
-        <Suspense fallback={null}>
-          <Explorer runs={runs} stats={stats} />
-        </Suspense>
+        <Explorer runs={runs} stats={stats} />
 
         <Leaderboard models={models} />
       </main>
