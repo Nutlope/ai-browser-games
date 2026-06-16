@@ -6,8 +6,7 @@
   flex-direction: column;
   gap: 11px;
   padding: 13px 0;
-  background: color-mix(in srgb, var(--paper) 88%, transparent);
-  backdrop-filter: saturate(180%) blur(8px);
+  background: var(--paper);
   border-bottom: 1px solid var(--hairline);
 }
 
