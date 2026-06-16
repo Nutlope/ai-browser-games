@@ -1,3 +1,4 @@
+import Image from "next/image";
 import styles from "./chrome.module.css";
 
 export function SiteFooter() {
@@ -10,6 +11,21 @@ export function SiteFooter() {
       <p className={styles.attribution}>
         Model logos are trademarks of their respective owners, shown for identification only.
       </p>
+      <a
+        href="https://www.together.ai"
+        target="_blank"
+        rel="noreferrer"
+        className={styles.madeBy}
+      >
+        Made by
+        <Image
+          src="/together-logo.png"
+          alt="Together AI"
+          width={86}
+          height={18}
+          className={styles.madeByLogo}
+        />
+      </a>
     </footer>
   );
 }

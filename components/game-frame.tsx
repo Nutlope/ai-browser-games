@@ -90,11 +90,14 @@ const AUTOPLAY_BOT = `(function(){
            ['ArrowDown','s'],['ArrowDown','s'],['ArrowDown','s'],['ArrowDown','s'],
            ['ArrowLeft','a'],['ArrowLeft','a'],['ArrowLeft','a'],['ArrowLeft','a'],
            ['ArrowUp','w'],['ArrowUp','w'],['ArrowUp','w'],['ArrowUp','w']];
-  var i=0,mt=0,last=null,still=0,blind=0;
+  var i=0,last=null,still=0,blind=0;
   function begin(){
     revive();
+    // Drive movement (and paddles) with the keyboard only. A synthetic mouse
+    // sweep used to also move paddles, but games that take BOTH mouse and keys
+    // (e.g. MiniMax Breakout) set the paddle target from each, so the two
+    // fought and the paddle visibly shook. Keys alone keep it smooth.
     setInterval(function(){ dir(seq[i%seq.length]); i++; }, 240);
-    setInterval(function(){ mt+=0.09; var r=rect(); mouse('mousemove', r.left+r.width*(0.5+0.42*Math.sin(mt)), r.top+r.height*0.82); }, 60);
     setInterval(function(){
       var s=snap();
       if(s===null) return;

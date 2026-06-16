@@ -21,6 +21,41 @@
   pointer-events: none;
 }
 
+.heroPill {
+  pointer-events: auto;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0 auto 22px;
+  padding: 7px 15px;
+  border: 1px solid var(--hairline);
+  border-radius: 999px;
+  background: var(--paper);
+  transition: border-color 0.2s var(--ease-out), background 0.2s var(--ease-out);
+}
+
+.heroPill:hover {
+  border-color: var(--hairline-strong);
+  background: var(--wash);
+}
+
+.heroPillLabel {
+  font-size: 13px;
+  letter-spacing: -0.005em;
+  color: var(--text-muted);
+  transition: color 0.2s var(--ease-out);
+}
+
+.heroPill:hover .heroPillLabel {
+  color: var(--text-soft);
+}
+
+.heroPillLogo {
+  display: block;
+  height: 18px;
+  width: auto;
+}
+
 .title {
   margin: 0 auto;
   font-size: clamp(2rem, 4.6vw, 3.25rem);
