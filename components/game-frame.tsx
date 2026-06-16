@@ -62,6 +62,10 @@ const AUTOPLAY_BOT = `(function(){
     tap(' '); tap('Enter'); tap('r'); tap('R');
     var r=rect(), cx=r.left+r.width/2, cy=r.top+r.height/2;
     mouse('mousedown',cx,cy); mouse('mouseup',cx,cy); mouse('click',cx,cy);
+    // Many games only start/restart via a real button (Play / START / Play Again);
+    // coordinate clicks do not hit-test, so click the actual button elements.
+    var bs=document.querySelectorAll('button,[role=button],input[type=button],input[type=submit]');
+    for(var bi=0;bi<bs.length;bi++){ try{ bs[bi].click(); }catch(e){} }
     tap('ArrowRight'); tap('d');
   }
   // Cheap fingerprint of the current frame: scaled canvas pixels when available,
