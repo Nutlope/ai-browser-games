@@ -84,20 +84,6 @@
   color: var(--ink);
 }
 
-.together {
-  display: inline-flex;
-  align-items: center;
-  transition: transform 0.16s var(--ease-out);
-}
-
-.together:hover {
-  transform: scale(1.1);
-}
-
-.togetherLogo {
-  display: block;
-}
-
 .footer {
   margin-top: 72px;
   padding: 28px 0 48px;
