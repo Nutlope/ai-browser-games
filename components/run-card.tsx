@@ -47,6 +47,7 @@ export function RunCard({ run, stats, gameCheapest, index = 0 }: RunCardProps) {
           html={run.html}
           title={`${run.label} ${run.game} preview`}
           lazy
+          autoplay
           className={styles.preview}
         />
         <span className={styles.playTag} aria-hidden="true">

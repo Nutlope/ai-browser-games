@@ -67,11 +67,23 @@ export function RunPlayer({ runs, initialId }: RunPlayerProps) {
     setCoarsePointer(window.matchMedia("(pointer: coarse)").matches);
   }, []);
 
-  // Stop the page from scrolling when game keys are pressed while the game frame is focused.
+  // Stop the page from scrolling when game keys are pressed on the play page.
+  // The keys still reach the game while its iframe is focused (those events
+  // fire inside the frame and never reach this listener); this only catches
+  // the case where focus is on the page, which is what caused the page to
+  // jump up/down while playing. Keys aimed at real controls are left alone.
   useEffect(() => {
     const onKeyDown = (event: KeyboardEvent) => {
+      if (!GAME_KEYS.has(event.key)) return;
       const active = document.activeElement;
-      if (active && frameWrapRef.current?.contains(active) && GAME_KEYS.has(event.key)) {
+      const tag = active?.tagName;
+      const typing =
+        tag === "INPUT" ||
+        tag === "TEXTAREA" ||
+        tag === "SELECT" ||
+        (active instanceof HTMLElement && active.isContentEditable);
+      const onControl = tag === "BUTTON" || tag === "A";
+      if (!typing && !onControl) {
         event.preventDefault();
       }
     };
