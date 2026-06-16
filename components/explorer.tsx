@@ -86,8 +86,6 @@ export function Explorer({ runs, stats }: ExplorerProps) {
     return set;
   }, [runs]);
 
-  const hasFailed = useMemo(() => runs.some((run) => run.broken), [runs]);
-
   const visible = useMemo(() => {
     const filtered = filterRuns(runs, state.game, state.makers, state.hideFailed);
     return sortRuns(filtered, state.sort, state.dir);
@@ -95,13 +93,7 @@ export function Explorer({ runs, stats }: ExplorerProps) {
 
   return (
     <section id="explore" className={styles.explorer}>
-      <Controls
-        state={state}
-        resultCount={visible.length}
-        availableMakers={availableMakers}
-        hasFailed={hasFailed}
-        onChange={onChange}
-      />
+      <Controls state={state} availableMakers={availableMakers} onChange={onChange} />
       <div className={styles.body}>
         {state.view === "gallery" ? (
           <Gallery runs={visible} stats={stats} />

@@ -178,6 +178,7 @@ export function CompareTable({ runs, stats, sort, dir, onSort }: CompareTablePro
               key={hovered.id}
               html={hovered.html}
               title={`${hovered.label} ${hovered.game} preview`}
+              autoplay
               className={styles.popupFrame}
             />
             <div className={styles.popupCaption}>

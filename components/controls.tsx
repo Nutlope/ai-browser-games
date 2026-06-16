@@ -11,9 +11,7 @@ import styles from "./controls.module.css";
 
 type ControlsProps = {
   state: ViewState;
-  resultCount: number;
   availableMakers: Set<string>;
-  hasFailed: boolean;
   onChange: (patch: Partial<ViewState>) => void;
 };
 
@@ -34,13 +32,7 @@ const VIEW_OPTIONS: { value: ViewMode; label: string }[] = [
   { value: "table", label: "Table" }
 ];
 
-export function Controls({
-  state,
-  resultCount,
-  availableMakers,
-  hasFailed,
-  onChange
-}: ControlsProps) {
+export function Controls({ state, availableMakers, onChange }: ControlsProps) {
   const toggleMaker = (id: (typeof MAKER_ORDER)[number]) => {
     const next = state.makers.includes(id)
       ? state.makers.filter((m) => m !== id)
@@ -139,20 +131,6 @@ export function Controls({
               </button>
             );
           })}
-        </div>
-        <div className={styles.rightMeta}>
-          {hasFailed ? (
-            <button
-              type="button"
-              className={styles.failToggle}
-              data-on={state.hideFailed}
-              aria-pressed={state.hideFailed}
-              onClick={() => onChange({ hideFailed: !state.hideFailed })}
-            >
-              Hide failed
-            </button>
-          ) : null}
-          <span className={`${styles.count} tnum`}>{resultCount} builds</span>
         </div>
       </div>
     </div>

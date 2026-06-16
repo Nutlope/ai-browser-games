@@ -48,13 +48,6 @@
 .preview {
   position: absolute;
   inset: 0;
-  filter: grayscale(1) contrast(0.92) brightness(1.02);
-  transition: filter 0.3s var(--ease-out);
-}
-
-.card:hover .preview,
-.card:focus-visible .preview {
-  filter: grayscale(0);
 }
 
 .playTag {

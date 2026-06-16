@@ -6,8 +6,7 @@
   flex-direction: column;
   gap: 11px;
   padding: 13px 0;
-  background: color-mix(in srgb, var(--paper) 88%, transparent);
-  backdrop-filter: saturate(180%) blur(8px);
+  background: var(--paper);
   border-bottom: 1px solid var(--hairline);
 }
 
@@ -129,49 +128,10 @@
   filter: grayscale(1);
 }
 
-.rightMeta {
-  display: inline-flex;
-  align-items: center;
-  gap: 12px;
-}
-
-.failToggle {
-  padding: 5px 11px;
-  border: 1px solid var(--hairline);
-  border-radius: 999px;
-  background: transparent;
-  color: var(--text-soft);
-  font-size: 12px;
-  white-space: nowrap;
-  transition: background 0.15s var(--ease-out), color 0.15s var(--ease-out),
-    border-color 0.15s var(--ease-out);
-}
-
-.failToggle:hover {
-  color: var(--ink);
-  border-color: var(--hairline-strong);
-}
-
-.failToggle[data-on="true"] {
-  background: var(--ink);
-  color: var(--paper);
-  border-color: var(--ink);
-  font-weight: 500;
-}
-
-.count {
-  font-size: 12px;
-  color: var(--text-muted);
-  white-space: nowrap;
-}
-
 @media (max-width: 600px) {
-  /* Hide the "Sort" label and result count so the sort/view filters fit on
-     one (horizontally scrollable) row. The "Hide failed" toggle stays
-     reachable on the maker-chips row so phone users can dismiss a failed
-     build. */
-  .sortLabel,
-  .count {
+  /* Hide the "Sort" label so the sort/view filters fit on one
+     (horizontally scrollable) row. */
+  .sortLabel {
     display: none;
   }
 

@@ -1,13 +1,10 @@
 import Link from "next/link";
-import { allEntries, gameDefinitions } from "@/lib/games";
+import { LeaderboardLink } from "@/components/leaderboard-link";
 import styles from "./chrome.module.css";
 
 const REPO_URL = "https://github.com/Nutlope/ai-browser-games";
 
 export function SiteHeader() {
-  const modelCount = new Set(allEntries.map((entry) => entry.model)).size;
-  const buildCount = allEntries.length;
-
   return (
     <header className={styles.header}>
       <Link href="/" className={styles.brand} aria-label="AI Browser Games, home">
@@ -15,9 +12,7 @@ export function SiteHeader() {
         <span className={styles.wordmark}>AI Browser Games</span>
       </Link>
       <div className={styles.headerRight}>
-        <span className={`${styles.meta} tnum`}>
-          {modelCount} models · {gameDefinitions.length} games · {buildCount} builds
-        </span>
+        <LeaderboardLink />
         <a
           href={REPO_URL}
           className={styles.gh}

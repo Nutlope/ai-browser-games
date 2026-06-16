@@ -60,10 +60,16 @@
   gap: 18px;
 }
 
-.meta {
-  font-size: 11px;
+.navLink {
+  font-size: 13px;
   color: var(--text-muted);
   white-space: nowrap;
+  transition: color 0.15s var(--ease-out);
+}
+
+.navLink:hover,
+.navLink:focus-visible {
+  color: var(--ink);
 }
 
 .gh {
@@ -101,8 +107,8 @@
   color: var(--text-muted);
 }
 
-@media (max-width: 560px) {
-  .meta {
+@media (max-width: 440px) {
+  .navLink {
     display: none;
   }
 }
