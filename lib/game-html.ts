@@ -50,6 +50,28 @@ const embeddedGamePrelude = `
     Object.defineProperty(window, "sessionStorage", { configurable: true, value: storage });
   } catch {}
 
+  // Keep an embedded game from scrolling the page that hosts it. Focusing an
+  // element inside an iframe makes the browser scroll the parent to bring the
+  // iframe into view, which yanked the gallery down to whichever preview
+  // started (e.g. a snake calling canvas.focus()). Force every focus() to
+  // preventScroll and neutralize scrollIntoView; focus still works for
+  // keyboard input, it just never moves the host page.
+  try {
+    const nativeFocus = HTMLElement.prototype.focus;
+    HTMLElement.prototype.focus = function (options) {
+      const opts = Object.assign({}, options, { preventScroll: true });
+      try {
+        return nativeFocus.call(this, opts);
+      } catch (error) {
+        return nativeFocus.call(this);
+      }
+    };
+  } catch {}
+
+  try {
+    Element.prototype.scrollIntoView = function () {};
+  } catch {}
+
   const gameControlKeys = new Set([
     "ArrowUp",
     "ArrowDown",
