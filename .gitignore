@@ -7,3 +7,6 @@ coverage
 .vercel
 .claude
 *.tsbuildinfo
+
+# env files (can opt-in for committing if needed)
+.env*
