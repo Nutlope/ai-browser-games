@@ -1,60 +1,100 @@
-import { mkdir, writeFile } from "node:fs/promises";
+import { mkdir, readFile, writeFile } from "node:fs/promises";
 import path from "node:path";
 import process from "node:process";
 import { fileURLToPath } from "node:url";
+
+import type { GameEntry } from "../types/game";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 const rootDir = path.resolve(__dirname, "..");
 const outputDir = path.join(rootDir, "generated");
-const outputPath = path.join(outputDir, "games.json");
-const reportPath = path.join(outputDir, "together-report.json");
+const outputPath = path.join(outputDir, "openrouter-games.json");
+const reportPath = path.join(outputDir, "openrouter-report.json");
 const MAX_OUTPUT_TOKENS = 20000;
-const REQUEST_TIMEOUT_MS = 250000;
 
-const apiKey = process.env.TOGETHER_API_KEY;
+const apiKey = process.env.OPENROUTER_API_KEY;
 
-const models = [
+type ModelConfig = {
+  id: string;
+  label: string;
+  provider: string;
+  inputPricePerMillion: number;
+  outputPricePerMillion: number;
+};
+
+type GamePromptConfig = {
+  key: string;
+  game: string;
+  slug: string;
+  prompt: string;
+};
+
+type Usage = {
+  prompt_tokens?: number;
+  completion_tokens?: number;
+  total_tokens?: number;
+};
+
+type ChatCompletionContentPart = string | { text?: string; [key: string]: unknown };
+
+type ChatCompletionPayload = {
+  choices?: Array<{
+    message?: {
+      content?: string | ChatCompletionContentPart[];
+    };
+  }>;
+  usage?: Usage;
+};
+
+type GenerationSuccess = {
+  model: string;
+  game: string;
+  outputTokens: number | null;
+  totalTokens: number | null;
+  costUsd: number | null;
+};
+
+type GenerationFailure = {
+  model: string;
+  game: string;
+  error: string;
+};
+
+const models: ModelConfig[] = [
   {
-    id: "deepseek-ai/DeepSeek-V4-Pro",
-    label: "DeepSeek V4 Pro",
-    provider: "Together",
-    inputPricePerMillion: 2.1,
-    outputPricePerMillion: 4.4,
+    id: "anthropic/claude-opus-4.8",
+    label: "Opus 4.8",
+    provider: "OpenRouter",
+    inputPricePerMillion: 15,
+    outputPricePerMillion: 75,
   },
   {
-    id: "moonshotai/Kimi-K2.7-Code",
-    label: "Kimi K2.7 Code",
-    provider: "Together",
-    inputPricePerMillion: 0.95,
-    outputPricePerMillion: 4,
+    id: "openai/gpt-5.5",
+    label: "GPT 5.5",
+    provider: "OpenRouter",
+    inputPricePerMillion: 5,
+    outputPricePerMillion: 30,
   },
   {
-    id: "MiniMaxAI/MiniMax-M3",
-    label: "MiniMax M3",
-    provider: "Together",
-    inputPricePerMillion: 0.3,
-    outputPricePerMillion: 1.2,
+    id: "anthropic/claude-sonnet-4.6",
+    label: "Sonnet 4.6",
+    provider: "OpenRouter",
+    inputPricePerMillion: 3,
+    outputPricePerMillion: 15,
   },
-  {
-    id: "zai-org/GLM-5.1",
-    label: "GLM 5.1",
-    provider: "Together",
-    inputPricePerMillion: 1.4,
-    outputPricePerMillion: 4.4,
-  },
-  {
-    id: "nvidia/nemotron-3-ultra-550b-a55b",
-    label: "Nemotron 3 Ultra 550B",
-    provider: "Together",
-    inputPricePerMillion: 0.60,
-    outputPricePerMillion: 3.60,
-  },
+  // {
+  //   id: "google/gemini-3.1-pro-preview",
+  //   label: "Gemini 3.1 Pro Preview",
+  //   provider: "OpenRouter",
+  //   inputPricePerMillion: 2,
+  //   outputPricePerMillion: 12
+  // }
 ];
 
 const promptVersion = "v2";
 
-const gamePrompts = [
+const gamePrompts: GamePromptConfig[] = [
   {
     key: "snakeEntries",
     game: "Snake",
@@ -106,14 +146,14 @@ const gamePrompts = [
   },
 ];
 
-function slugify(value) {
+function slugify(value: string): string {
   return value
     .toLowerCase()
     .replace(/[^a-z0-9]+/g, "-")
     .replace(/(^-|-$)/g, "");
 }
 
-function extractTextContent(content) {
+function extractTextContent(content: string | ChatCompletionContentPart[] | undefined): string {
   if (typeof content === "string") {
     return content;
   }
@@ -125,12 +165,7 @@ function extractTextContent(content) {
           return item;
         }
 
-        if (
-          item &&
-          typeof item === "object" &&
-          "text" in item &&
-          typeof item.text === "string"
-        ) {
+        if (item && typeof item === "object" && "text" in item && typeof item.text === "string") {
           return item.text;
         }
 
@@ -142,7 +177,7 @@ function extractTextContent(content) {
   return "";
 }
 
-function stripCodeFences(value) {
+function stripCodeFences(value: string): string {
   return value
     .trim()
     .replace(/^```(?:html)?\s*/i, "")
@@ -150,12 +185,12 @@ function stripCodeFences(value) {
     .trim();
 }
 
-function looksLikeCompleteHtml(value) {
+function looksLikeCompleteHtml(value: string): boolean {
   const trimmed = value.trim().toLowerCase();
   return trimmed.includes("<html") && trimmed.includes("</html>");
 }
 
-function assertValidHtml(html, usage) {
+function assertValidHtml(html: string, usage: Usage | undefined): void {
   if (!looksLikeCompleteHtml(html)) {
     const tokenNote =
       usage?.completion_tokens === MAX_OUTPUT_TOKENS
@@ -166,7 +201,7 @@ function assertValidHtml(html, usage) {
   }
 }
 
-function computeCostUsd(usage, model) {
+function computeCostUsd(usage: Usage | undefined, model: ModelConfig): number {
   const promptTokens = usage?.prompt_tokens ?? 0;
   const completionTokens = usage?.completion_tokens ?? 0;
   const cost =
@@ -176,13 +211,48 @@ function computeCostUsd(usage, model) {
   return Number(cost.toFixed(6));
 }
 
-async function createGame(model, gamePrompt) {
-  const response = await fetch("https://api.together.xyz/v1/chat/completions", {
+async function loadExistingOutput(): Promise<Record<string, GameEntry[]>> {
+  try {
+    const file = await readFile(outputPath, "utf8");
+    const parsed = JSON.parse(file) as Record<string, unknown>;
+
+    return Object.fromEntries(
+      gamePrompts.map((gamePrompt) => [
+        gamePrompt.key,
+        Array.isArray(parsed[gamePrompt.key]) ? (parsed[gamePrompt.key] as GameEntry[]) : [],
+      ]),
+    );
+  } catch {
+    return Object.fromEntries(gamePrompts.map((gamePrompt) => [gamePrompt.key, []]));
+  }
+}
+
+function mergeEntries(existingEntries: GameEntry[], nextEntries: GameEntry[]): GameEntry[] {
+  const byId = new Map(existingEntries.map((entry) => [entry.id, entry]));
+
+  for (const entry of nextEntries) {
+    byId.set(entry.id, entry);
+  }
+
+  return Array.from(byId.values()).sort((left, right) => {
+    const providerDiff =
+      (left.provider === "OpenRouter" ? 1 : 0) - (right.provider === "OpenRouter" ? 1 : 0);
+    if (providerDiff !== 0) {
+      return providerDiff;
+    }
+
+    return left.label.localeCompare(right.label);
+  });
+}
+
+async function createGame(model: ModelConfig, gamePrompt: GamePromptConfig): Promise<GameEntry> {
+  const response = await fetch("https://openrouter.ai/api/v1/chat/completions", {
     method: "POST",
-    signal: AbortSignal.timeout(REQUEST_TIMEOUT_MS),
     headers: {
       Authorization: `Bearer ${apiKey}`,
       "Content-Type": "application/json",
+      "HTTP-Referer": "https://localhost",
+      "X-Title": "AI Browser Games",
     },
     body: JSON.stringify({
       model: model.id,
@@ -207,7 +277,7 @@ async function createGame(model, gamePrompt) {
     throw new Error(`${response.status} ${response.statusText}: ${errorText}`);
   }
 
-  const payload = await response.json();
+  const payload = (await response.json()) as ChatCompletionPayload;
   const choice = payload.choices?.[0];
   const html = stripCodeFences(extractTextContent(choice?.message?.content));
   const usage = payload.usage ?? {};
@@ -230,13 +300,17 @@ async function createGame(model, gamePrompt) {
     totalTokens: usage.total_tokens ?? undefined,
     generationCostUsd: computeCostUsd(usage, model),
     generatedAt: new Date().toISOString(),
-    description: `Generated via Together using ${model.id} (${promptVersion}).`,
+    description: `Generated via OpenRouter using ${model.id} (${promptVersion}).`,
     html,
   };
 }
 
-async function attemptCreateGame(model, gamePrompt, retries = 3) {
-  let lastError;
+async function attemptCreateGame(
+  model: ModelConfig,
+  gamePrompt: GamePromptConfig,
+  retries = 3,
+): Promise<GameEntry> {
+  let lastError: unknown;
 
   for (let attempt = 0; attempt <= retries; attempt += 1) {
     try {
@@ -245,9 +319,7 @@ async function attemptCreateGame(model, gamePrompt, retries = 3) {
       lastError = error;
 
       if (attempt < retries) {
-        await new Promise((resolve) =>
-          setTimeout(resolve, 1200 * (attempt + 1)),
-        );
+        await new Promise((resolve) => setTimeout(resolve, 1200 * (attempt + 1)));
       }
     }
   }
@@ -255,19 +327,19 @@ async function attemptCreateGame(model, gamePrompt, retries = 3) {
   throw lastError;
 }
 
-async function main() {
+async function main(): Promise<void> {
   if (!apiKey) {
     console.error(
-      "Missing TOGETHER_API_KEY. Add it to your environment before running pnpm generate:games.",
+      "Missing OPENROUTER_API_KEY. Add it to your environment before running pnpm generate:games-other.",
     );
     process.exit(1);
   }
 
-  const output = Object.fromEntries(
+  const output: Record<string, GameEntry[]> = Object.fromEntries(
     gamePrompts.map((gamePrompt) => [gamePrompt.key, []]),
   );
-  const failures = [];
-  const successes = [];
+  const failures: GenerationFailure[] = [];
+  const successes: GenerationSuccess[] = [];
   let successCount = 0;
 
   for (const gamePrompt of gamePrompts) {
@@ -302,10 +374,7 @@ async function main() {
       failures.push({
         model: model.id,
         game: gamePrompt.game,
-        error:
-          result.reason instanceof Error
-            ? result.reason.message
-            : String(result.reason),
+        error: result.reason instanceof Error ? result.reason.message : String(result.reason),
       });
     });
   }
@@ -315,7 +384,7 @@ async function main() {
     reportPath,
     JSON.stringify(
       {
-        provider: "Together",
+        provider: "OpenRouter",
         generatedAt: new Date().toISOString(),
         successCount,
         failureCount: failures.length,
@@ -330,29 +399,26 @@ async function main() {
 
   if (successCount === 0) {
     throw new Error(
-      "No generations succeeded, so generated/games.json was left unchanged.",
+      "No generations succeeded, so generated/openrouter-games.json was left unchanged.",
     );
   }
 
-  const nextOutput = Object.fromEntries(
+  const existing = await loadExistingOutput();
+  const merged = Object.fromEntries(
     gamePrompts.map((gamePrompt) => [
       gamePrompt.key,
-      output[gamePrompt.key].sort((left, right) =>
-        left.label.localeCompare(right.label),
-      ),
+      mergeEntries(existing[gamePrompt.key], output[gamePrompt.key]),
     ]),
   );
 
-  await writeFile(outputPath, JSON.stringify(nextOutput, null, 2) + "\n", "utf8");
+  await writeFile(outputPath, JSON.stringify(merged, null, 2) + "\n", "utf8");
 
   process.stdout.write(`Wrote ${outputPath}\n`);
 
   if (failures.length > 0) {
     process.stderr.write("Failed generations:\n");
     failures.forEach((failure) => {
-      process.stderr.write(
-        `- ${failure.model} / ${failure.game}: ${failure.error}\n`,
-      );
+      process.stderr.write(`- ${failure.model} / ${failure.game}: ${failure.error}\n`);
     });
     process.exitCode = 1;
   } else {

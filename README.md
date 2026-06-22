@@ -36,8 +36,8 @@ The benchmark asks each model to build the same three self-contained browser gam
 
 The app has two separate generation pipelines:
 
-- `scripts/generate-games.mjs` generates Together-hosted model runs
-- `scripts/generate-openrouter-games.mjs` generates OpenRouter model runs
+- `scripts/generate-games.ts` generates Together-hosted model runs
+- `scripts/generate-openrouter-games.ts` generates OpenRouter model runs
 
 Each script sends the same game prompts to its configured models, retries failed generations, validates that the model returned a complete HTML document, estimates cost from token usage and configured model prices, then writes a data file plus a generation report.
 
@@ -149,8 +149,8 @@ lib/
   game-html.ts             Generated HTML preparation and validation
 
 scripts/
-  generate-games.mjs       Together generation pipeline
-  generate-openrouter-games.mjs
+  generate-games.ts        Together generation pipeline
+  generate-openrouter-games.ts
 
 types/
   game.ts                  Shared generated game entry shape

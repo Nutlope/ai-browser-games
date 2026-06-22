@@ -7,8 +7,8 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "generate:games-together": "node scripts/generate-games.mjs",
-    "generate:games-other": "node scripts/generate-openrouter-games.mjs"
+    "generate:games-together": "tsx scripts/generate-games.ts",
+    "generate:games-other": "tsx scripts/generate-openrouter-games.ts"
   },
   "dependencies": {
     "motion": "^12.40.0",
@@ -20,6 +20,7 @@
     "@types/node": "22.13.14",
     "@types/react": "19.0.12",
     "@types/react-dom": "19.0.4",
+    "tsx": "^4.20.6",
     "typescript": "5.8.2"
   }
 }

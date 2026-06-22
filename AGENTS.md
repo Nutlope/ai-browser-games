@@ -36,8 +36,8 @@ Generation commands require API keys:
 - `lib/makers.ts`: Maps `sourceModelId` namespace to the real maker company.
 - `lib/format.ts`, `lib/runs-view.ts`: Number formatting and filter/sort logic.
 - `lib/game-html.ts`: Embedded HTML preparation and generated syntax checks.
-- `scripts/generate-games.mjs`: Together generation script.
-- `scripts/generate-openrouter-games.mjs`: OpenRouter generation script.
+- `scripts/generate-games.ts`: Together generation script (run via `tsx`).
+- `scripts/generate-openrouter-games.ts`: OpenRouter generation script (run via `tsx`).
 - `types/game.ts`: Shared `GameEntry` shape.
 
 ## Development Notes
