@@ -6,7 +6,7 @@ AI Game Comparison runs the same small game prompts through multiple models, sav
 
 ## How it works
 
-The benchmark asks each model to build the same three self-contained browser games. The generated HTML is committed as data, so the app can be deployed and browsed without calling any model APIs at runtime.
+The benchmark asks each model to build the same set of self-contained browser games. The generated HTML is committed as data, so the app can be deployed and browsed without calling any model APIs at runtime.
 
 1. **Prompt** each model with the same game spec
 2. **Generate** one single-file HTML game per model and game
@@ -16,7 +16,7 @@ The benchmark asks each model to build the same three self-contained browser gam
 
 ## What you can compare
 
-- **Games**: Snake, Tetris-lite, and Breakout
+- **Games**: Snake, Tetris-lite, Breakout, 2048, Asteroids, Pac-Man, Doom, Minecraft, and Quake
 - **Runs**: playable generated HTML in sandboxed iframes
 - **Costs**: estimated USD cost from recorded input and output token counts
 - **Tokens**: prompt, completion, and total token usage per run
@@ -39,7 +39,7 @@ The app has two separate generation pipelines:
 - `scripts/generate-games.ts` generates Together-hosted model runs
 - `scripts/generate-openrouter-games.ts` generates OpenRouter model runs
 
-Each script sends the same game prompts to its configured models, retries failed generations, validates that the model returned a complete HTML document, estimates cost from token usage and configured model prices, then writes a data file plus a generation report.
+Both scripts share `scripts/shared/game-prompts.ts` (the single list of game prompts) and `scripts/shared/generation.ts` (request/retry/merge/write orchestration), so each script only declares its own models and fetch config. Generation sends the shared game prompts to each provider's configured models, retries failed generations, validates that the model returned a complete HTML document, estimates cost from token usage and configured model prices, then merges into the existing data file (without dropping previously generated games) plus writes a generation report.
 
 The website loads:
 
@@ -149,8 +149,11 @@ lib/
   game-html.ts             Generated HTML preparation and validation
 
 scripts/
-  generate-games.ts        Together generation pipeline
-  generate-openrouter-games.ts
+  generate-games.ts        Together generation pipeline (models + fetch config)
+  generate-openrouter-games.ts  OpenRouter generation pipeline (models + fetch config)
+  shared/
+    game-prompts.ts        The single shared list of game prompts
+    generation.ts          Shared types and the runGeneration orchestrator
 
 types/
   game.ts                  Shared generated game entry shape

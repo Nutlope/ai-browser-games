@@ -8,7 +8,16 @@ import type { GameEntry } from "@/types/game";
 import generatedGames from "@/generated/games.json";
 import openrouterGames from "@/generated/openrouter-games.json";
 
-export type GameSlug = "snake" | "tetris" | "breakout";
+export type GameSlug =
+  | "snake"
+  | "tetris"
+  | "breakout"
+  | "2048"
+  | "asteroids"
+  | "pacman"
+  | "doom"
+  | "minecraft"
+  | "quake";
 
 export type GameDefinition = {
   slug: GameSlug;
@@ -23,6 +32,12 @@ type GeneratedGamesFile = {
   snakeEntries?: GameEntry[];
   tetrisLiteEntries?: GameEntry[];
   breakoutEntries?: GameEntry[];
+  twoZeroFourEightEntries?: GameEntry[];
+  asteroidsEntries?: GameEntry[];
+  pacmanEntries?: GameEntry[];
+  doomEntries?: GameEntry[];
+  minecraftEntries?: GameEntry[];
+  quakeEntries?: GameEntry[];
 };
 
 const generated = generatedGames as GeneratedGamesFile;
@@ -119,6 +134,60 @@ export const gameDefinitions: GameDefinition[] = [
     description:
       "A paddle-and-ball benchmark for comparing physics, brick collision, scoring, levels, and visual feedback.",
     cardText: "Ball physics, paddle control, brick hits, and polish."
+  },
+  {
+    slug: "2048",
+    entriesKey: "twoZeroFourEightEntries",
+    name: "2048",
+    title: "2048",
+    description:
+      "A sliding-tile puzzle benchmark for grid state, merge logic, spawn probabilities, game-over detection, and animation polish.",
+    cardText: "Grid state, merge rules, spawn logic, and game-over flow."
+  },
+  {
+    slug: "asteroids",
+    entriesKey: "asteroidsEntries",
+    name: "Asteroids",
+    title: "Asteroids",
+    description:
+      "A vector-graphics arcade benchmark for thrust physics, screen wrap, asteroid splitting, bullet lifecycles, and lives.",
+    cardText: "Vector physics, rotation, splitting, screen wrap, and timing."
+  },
+  {
+    slug: "pacman",
+    entriesKey: "pacmanEntries",
+    name: "Pac-Man",
+    title: "Pac-Man",
+    description:
+      "A maze-chase benchmark for tile-based movement, ghost AI with distinct targeting strategies, power-dot state, and round flow.",
+    cardText: "Maze pathfinding, ghost AI, power dots, and round logic."
+  },
+  {
+    slug: "doom",
+    entriesKey: "doomEntries",
+    name: "Doom",
+    title: "Doom",
+    description:
+      "A first-person raycaster benchmark for per-column depth math, procedural wall textures, billboard sprites, and projectile combat in raw Canvas2D.",
+    cardText: "Raycasting depth, sprite z-sorting, collision, and shooting."
+  },
+  {
+    slug: "minecraft",
+    entriesKey: "minecraftEntries",
+    name: "Minecraft",
+    title: "Minecraft",
+    description:
+      "A voxel-sandbox benchmark for procedural terrain, raw-WebGL rendering, first-person movement/collision, and block place/break.",
+    cardText: "Procedural terrain, voxel meshing, FPS movement, and block edits."
+  },
+  {
+    slug: "quake",
+    entriesKey: "quakeEntries",
+    name: "Quake",
+    title: "Quake",
+    description:
+      "A first-person-shooter benchmark for hand-authored WebGL geometry, a small vertex/fragment shader pipeline, enemy AI, and combat.",
+    cardText: "Hand-authored WebGL geometry, shaders, enemy AI, and combat."
   }
 ];
 
@@ -146,11 +215,23 @@ export const snakeEntries: GameEntry[] =
 
 export const tetrisLiteEntries: GameEntry[] = entriesForKey("tetrisLiteEntries");
 export const breakoutEntries: GameEntry[] = entriesForKey("breakoutEntries");
+export const twoZeroFourEightEntries: GameEntry[] = entriesForKey("twoZeroFourEightEntries");
+export const asteroidsEntries: GameEntry[] = entriesForKey("asteroidsEntries");
+export const pacmanEntries: GameEntry[] = entriesForKey("pacmanEntries");
+export const doomEntries: GameEntry[] = entriesForKey("doomEntries");
+export const minecraftEntries: GameEntry[] = entriesForKey("minecraftEntries");
+export const quakeEntries: GameEntry[] = entriesForKey("quakeEntries");
 
 export const entriesByGame: Record<GameSlug, GameEntry[]> = {
   snake: snakeEntries,
   tetris: tetrisLiteEntries,
-  breakout: breakoutEntries
+  breakout: breakoutEntries,
+  2048: twoZeroFourEightEntries,
+  asteroids: asteroidsEntries,
+  pacman: pacmanEntries,
+  doom: doomEntries,
+  minecraft: minecraftEntries,
+  quake: quakeEntries
 };
 
 export const allEntries = gameDefinitions.flatMap((game) => entriesByGame[game.slug]);
@@ -165,12 +246,6 @@ export type Run = GameEntry & {
   gameSlug: GameSlug;
 };
 
-const GAME_NAME_TO_SLUG: Record<string, GameSlug> = {
-  Snake: "snake",
-  Tetris: "tetris",
-  Breakout: "breakout"
-};
-
 function toRun(entry: GameEntry, gameSlug: GameSlug): Run {
   return {
     ...entry,
@@ -180,11 +255,12 @@ function toRun(entry: GameEntry, gameSlug: GameSlug): Run {
 }
 
 export function getRunsByGame(): Record<GameSlug, Run[]> {
-  return {
-    snake: snakeEntries.map((entry) => toRun(entry, "snake")),
-    tetris: tetrisLiteEntries.map((entry) => toRun(entry, "tetris")),
-    breakout: breakoutEntries.map((entry) => toRun(entry, "breakout"))
-  };
+  return Object.fromEntries(
+    gameDefinitions.map((game) => [
+      game.slug,
+      entriesByGame[game.slug].map((entry) => toRun(entry, game.slug))
+    ])
+  ) as Record<GameSlug, Run[]>;
 }
 
 export function getAllRuns(): Run[] {
