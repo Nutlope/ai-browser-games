@@ -14,7 +14,7 @@ import {
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 const rootDir = path.resolve(__dirname, "..");
-const outputDir = path.join(rootDir, "generated");
+const generatedDir = path.join(rootDir, "generated");
 
 const apiKey = process.env.OPENROUTER_API_KEY;
 
@@ -72,8 +72,8 @@ runGeneration({
   missingKeyMessage:
     "Missing OPENROUTER_API_KEY. Add it to your environment before running pnpm generate:games-other.",
   models,
-  outputPath: path.join(outputDir, "openrouter-games.json"),
-  reportPath: path.join(outputDir, "openrouter-report.json"),
+  outputDir: path.join(generatedDir, "openrouter"),
+  reportPath: path.join(generatedDir, "openrouter-report.json"),
   createGame,
 }).catch((error) => {
   console.error(error instanceof Error ? error.message : String(error));

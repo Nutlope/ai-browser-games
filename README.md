@@ -39,15 +39,16 @@ The app has two separate generation pipelines:
 - `scripts/generate-games.ts` generates Together-hosted model runs
 - `scripts/generate-openrouter-games.ts` generates OpenRouter model runs
 
-Both scripts share `scripts/shared/game-prompts.ts` (the single list of game prompts) and `scripts/shared/generation.ts` (request/retry/merge/write orchestration), so each script only declares its own models and fetch config. Generation sends the shared game prompts to each provider's configured models, retries failed generations, validates that the model returned a complete HTML document, estimates cost from token usage and configured model prices, then merges into the existing data file (without dropping previously generated games) plus writes a generation report.
+Both scripts share `scripts/shared/game-prompts.ts` (the single list of game prompts) and `scripts/shared/generation.ts` (request/retry/persist orchestration), so each script only declares its own models and fetch config. Generation runs every (game, model) pair concurrently, retries failed generations, validates that the model returned a complete HTML document, estimates cost from token usage and configured model prices, and persists each successful entry to its own file as soon as it lands (without dropping previously generated games) plus writes a generation report.
+
+`scripts/generate-per-game.ts` spawns one OS process per game (each scoped via `GENERATE_GAMES` to a single slug), so a hang or repeated failure on one game can never block, delay, or hide the others: `pnpm generate:games-together:per-game` / `pnpm generate:games-other:per-game`. Both `GENERATE_GAMES` and `GENERATE_MODELS` (comma-separated slugs/labels) also work as filters on the regular per-provider scripts, to cheaply regenerate a subset.
 
 The website loads:
 
-- `generated/games.json` for Together runs
-- `generated/openrouter-games.json` for OpenRouter runs
+- `generated/together/<slug>.json` and `generated/openrouter/<slug>.json` — one file per game per provider, so a single game's data never touches every other game's git diff or generation write
 - `generated/together-report.json` and `generated/openrouter-report.json` for generation reports
 
-At runtime, `lib/games.ts` merges the data, normalizes Tetris-lite to Tetris for display, checks generated HTML for syntax issues, and prepares each game for iframe embedding.
+At runtime, `lib/games.ts` merges the per-game files, normalizes Tetris-lite to Tetris for display, checks generated HTML for syntax issues, and prepares each game for iframe embedding.
 
 ## Running locally
 
@@ -93,7 +94,7 @@ TOGETHER_API_KEY=your_key_here pnpm generate:games-together
 
 This writes:
 
-- `generated/games.json`
+- `generated/together/<slug>.json` (one file per game)
 - `generated/together-report.json`
 
 ### OpenRouter
@@ -106,12 +107,12 @@ OPENROUTER_API_KEY=your_key_here pnpm generate:games-other
 
 This writes:
 
-- `generated/openrouter-games.json`
+- `generated/openrouter/<slug>.json` (one file per game)
 - `generated/openrouter-report.json`
 
 ### Important benchmark notes
 
-- Generation scripts overwrite their provider's generated data file.
+- Generation scripts merge into each game's existing file rather than overwriting it, so a partial run never erases other games' data.
 - API keys are only needed when regenerating benchmark data.
 - Generated game entries should stay self-contained: no external assets, fonts, libraries, or network requests.
 - Costs are estimates based on token counts and the configured model prices in the scripts.
@@ -136,9 +137,9 @@ components/
   logos.tsx                Single-color maker logos
 
 generated/
-  games.json               Together-generated game data
+  together/<slug>.json     One file per game, Together-generated entries
+  openrouter/<slug>.json   One file per game, OpenRouter-generated entries
   together-report.json     Together generation report
-  openrouter-games.json    OpenRouter-generated game data
   openrouter-report.json   OpenRouter generation report
 
 lib/
@@ -151,6 +152,7 @@ lib/
 scripts/
   generate-games.ts        Together generation pipeline (models + fetch config)
   generate-openrouter-games.ts  OpenRouter generation pipeline (models + fetch config)
+  generate-per-game.ts     Spawns one process per game (GENERATE_GAMES scoped) per provider
   shared/
     game-prompts.ts        The single shared list of game prompts
     generation.ts          Shared types and the runGeneration orchestrator

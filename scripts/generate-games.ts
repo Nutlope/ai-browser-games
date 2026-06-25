@@ -14,7 +14,7 @@ import {
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 const rootDir = path.resolve(__dirname, "..");
-const outputDir = path.join(rootDir, "generated");
+const generatedDir = path.join(rootDir, "generated");
 const REQUEST_TIMEOUT_MS = 250000;
 
 const apiKey = process.env.TOGETHER_API_KEY;
@@ -42,8 +42,8 @@ const models: ModelConfig[] = [
     outputPricePerMillion: 1.2,
   },
   {
-    id: "zai-org/GLM-5.1",
-    label: "GLM 5.1",
+    id: "zai-org/GLM-5.2",
+    label: "GLM 5.2",
     provider: "Together",
     inputPricePerMillion: 1.4,
     outputPricePerMillion: 4.4,
@@ -77,8 +77,8 @@ runGeneration({
   missingKeyMessage:
     "Missing TOGETHER_API_KEY. Add it to your environment before running pnpm generate:games-together.",
   models,
-  outputPath: path.join(outputDir, "games.json"),
-  reportPath: path.join(outputDir, "together-report.json"),
+  outputDir: path.join(generatedDir, "together"),
+  reportPath: path.join(generatedDir, "together-report.json"),
   createGame,
 }).catch((error) => {
   console.error(error instanceof Error ? error.message : String(error));

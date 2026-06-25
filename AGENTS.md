@@ -53,7 +53,7 @@ Generation commands require API keys:
 - Keep game entries self-contained. Generated HTML should not require external assets, fonts, libraries, or network requests.
 - When changing the generated data shape, update `types/game.ts`, `lib/games.ts`, and both generator scripts together.
 - When adding a model from a new company, add its maker mapping in `lib/makers.ts` and a single-color logo in `components/logos.tsx`.
-- When adding a new game, update `gameDefinitions`, `entriesByGame`, the shared prompt list in `scripts/shared/game-prompts.ts`, and routing expectations.
+- When adding a new game, update the shared prompt list in `scripts/shared/game-prompts.ts`, then in `lib/games.ts` add the per-provider JSON imports (`generated/together/<slug>.json` and `generated/openrouter/<slug>.json`), the `togetherBySlug`/`openrouterBySlug` entries, `gameDefinitions`, and `entriesByGame`.
 - Keep generated JSON files valid, formatted with two-space indentation, and committed when benchmark data changes.
 - Avoid editing `tsconfig.tsbuildinfo`; it is a build artifact.
 - Do not commit secrets, `.env` files, API keys, or provider credentials.

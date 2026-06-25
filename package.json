@@ -8,7 +8,9 @@
     "start": "next start",
     "lint": "next lint",
     "generate:games-together": "tsx scripts/generate-games.ts",
-    "generate:games-other": "tsx scripts/generate-openrouter-games.ts"
+    "generate:games-other": "tsx scripts/generate-openrouter-games.ts",
+    "generate:games-together:per-game": "tsx scripts/generate-per-game.ts together",
+    "generate:games-other:per-game": "tsx scripts/generate-per-game.ts openrouter"
   },
   "dependencies": {
     "motion": "^12.40.0",

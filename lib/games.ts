@@ -5,8 +5,30 @@ import {
 } from "@/lib/game-html";
 import { makerFromSourceId, type Maker, type MakerId } from "@/lib/makers";
 import type { GameEntry } from "@/types/game";
-import generatedGames from "@/generated/games.json";
-import openrouterGames from "@/generated/openrouter-games.json";
+
+// Each game gets its own file per provider (generated/<provider>/<slug>.json)
+// instead of one shared blob, so a single game's data never makes every
+// other game's git diff or every generation run's write touch one giant file.
+// Next.js requires statically analyzable import paths, so these are listed
+// individually rather than loaded by a runtime glob.
+import snakeTogether from "@/generated/together/snake.json";
+import snakeOpenRouter from "@/generated/openrouter/snake.json";
+import tetrisLiteTogether from "@/generated/together/tetris-lite.json";
+import tetrisLiteOpenRouter from "@/generated/openrouter/tetris-lite.json";
+import breakoutTogether from "@/generated/together/breakout.json";
+import breakoutOpenRouter from "@/generated/openrouter/breakout.json";
+import twoZeroFourEightTogether from "@/generated/together/2048.json";
+import twoZeroFourEightOpenRouter from "@/generated/openrouter/2048.json";
+import asteroidsTogether from "@/generated/together/asteroids.json";
+import asteroidsOpenRouter from "@/generated/openrouter/asteroids.json";
+import pacmanTogether from "@/generated/together/pacman.json";
+import pacmanOpenRouter from "@/generated/openrouter/pacman.json";
+import doomTogether from "@/generated/together/doom.json";
+import doomOpenRouter from "@/generated/openrouter/doom.json";
+import minecraftTogether from "@/generated/together/minecraft.json";
+import minecraftOpenRouter from "@/generated/openrouter/minecraft.json";
+import quakeTogether from "@/generated/together/quake.json";
+import quakeOpenRouter from "@/generated/openrouter/quake.json";
 
 export type GameSlug =
   | "snake"
@@ -21,27 +43,37 @@ export type GameSlug =
 
 export type GameDefinition = {
   slug: GameSlug;
-  entriesKey: `${string}Entries`;
+  /** Filename (without extension) under generated/<provider>/, e.g. "tetris-lite" for the "tetris" route. */
+  dataSlug: string;
   name: string;
   title: string;
   description: string;
   cardText: string;
 };
 
-type GeneratedGamesFile = {
-  snakeEntries?: GameEntry[];
-  tetrisLiteEntries?: GameEntry[];
-  breakoutEntries?: GameEntry[];
-  twoZeroFourEightEntries?: GameEntry[];
-  asteroidsEntries?: GameEntry[];
-  pacmanEntries?: GameEntry[];
-  doomEntries?: GameEntry[];
-  minecraftEntries?: GameEntry[];
-  quakeEntries?: GameEntry[];
+const togetherBySlug: Record<string, GameEntry[]> = {
+  snake: snakeTogether as GameEntry[],
+  "tetris-lite": tetrisLiteTogether as GameEntry[],
+  breakout: breakoutTogether as GameEntry[],
+  "2048": twoZeroFourEightTogether as GameEntry[],
+  asteroids: asteroidsTogether as GameEntry[],
+  pacman: pacmanTogether as GameEntry[],
+  doom: doomTogether as GameEntry[],
+  minecraft: minecraftTogether as GameEntry[],
+  quake: quakeTogether as GameEntry[]
 };
 
-const generated = generatedGames as GeneratedGamesFile;
-const openrouter = openrouterGames as GeneratedGamesFile;
+const openrouterBySlug: Record<string, GameEntry[]> = {
+  snake: snakeOpenRouter as GameEntry[],
+  "tetris-lite": tetrisLiteOpenRouter as GameEntry[],
+  breakout: breakoutOpenRouter as GameEntry[],
+  "2048": twoZeroFourEightOpenRouter as GameEntry[],
+  asteroids: asteroidsOpenRouter as GameEntry[],
+  pacman: pacmanOpenRouter as GameEntry[],
+  doom: doomOpenRouter as GameEntry[],
+  minecraft: minecraftOpenRouter as GameEntry[],
+  quake: quakeOpenRouter as GameEntry[]
+};
 
 function providerSortRank(provider?: string) {
   if (provider === "OpenRouter") {
@@ -103,14 +135,14 @@ function mergeGameEntries(
   return sortEntriesForDisplay(Array.from(byId.values())).map(prepareEntryForDisplay);
 }
 
-function entriesForKey(key: keyof GeneratedGamesFile) {
-  return mergeGameEntries(generated[key], openrouter[key]);
+function entriesForDataSlug(dataSlug: string) {
+  return mergeGameEntries(togetherBySlug[dataSlug], openrouterBySlug[dataSlug]);
 }
 
 export const gameDefinitions: GameDefinition[] = [
   {
     slug: "snake",
-    entriesKey: "snakeEntries",
+    dataSlug: "snake",
     name: "Snake",
     title: "Snake",
     description:
@@ -119,7 +151,7 @@ export const gameDefinitions: GameDefinition[] = [
   },
   {
     slug: "tetris",
-    entriesKey: "tetrisLiteEntries",
+    dataSlug: "tetris-lite",
     name: "Tetris",
     title: "Tetris",
     description:
@@ -128,7 +160,7 @@ export const gameDefinitions: GameDefinition[] = [
   },
   {
     slug: "breakout",
-    entriesKey: "breakoutEntries",
+    dataSlug: "breakout",
     name: "Breakout",
     title: "Breakout",
     description:
@@ -137,7 +169,7 @@ export const gameDefinitions: GameDefinition[] = [
   },
   {
     slug: "2048",
-    entriesKey: "twoZeroFourEightEntries",
+    dataSlug: "2048",
     name: "2048",
     title: "2048",
     description:
@@ -146,7 +178,7 @@ export const gameDefinitions: GameDefinition[] = [
   },
   {
     slug: "asteroids",
-    entriesKey: "asteroidsEntries",
+    dataSlug: "asteroids",
     name: "Asteroids",
     title: "Asteroids",
     description:
@@ -155,7 +187,7 @@ export const gameDefinitions: GameDefinition[] = [
   },
   {
     slug: "pacman",
-    entriesKey: "pacmanEntries",
+    dataSlug: "pacman",
     name: "Pac-Man",
     title: "Pac-Man",
     description:
@@ -164,7 +196,7 @@ export const gameDefinitions: GameDefinition[] = [
   },
   {
     slug: "doom",
-    entriesKey: "doomEntries",
+    dataSlug: "doom",
     name: "Doom",
     title: "Doom",
     description:
@@ -173,7 +205,7 @@ export const gameDefinitions: GameDefinition[] = [
   },
   {
     slug: "minecraft",
-    entriesKey: "minecraftEntries",
+    dataSlug: "minecraft",
     name: "Minecraft",
     title: "Minecraft",
     description:
@@ -182,7 +214,7 @@ export const gameDefinitions: GameDefinition[] = [
   },
   {
     slug: "quake",
-    entriesKey: "quakeEntries",
+    dataSlug: "quake",
     name: "Quake",
     title: "Quake",
     description:
@@ -208,19 +240,19 @@ const fallbackSnakeEntries: GameEntry[] = [
   }
 ];
 
-const mergedSnakeEntries = entriesForKey("snakeEntries");
+const mergedSnakeEntries = entriesForDataSlug("snake");
 
 export const snakeEntries: GameEntry[] =
   mergedSnakeEntries.length > 0 ? mergedSnakeEntries : fallbackSnakeEntries;
 
-export const tetrisLiteEntries: GameEntry[] = entriesForKey("tetrisLiteEntries");
-export const breakoutEntries: GameEntry[] = entriesForKey("breakoutEntries");
-export const twoZeroFourEightEntries: GameEntry[] = entriesForKey("twoZeroFourEightEntries");
-export const asteroidsEntries: GameEntry[] = entriesForKey("asteroidsEntries");
-export const pacmanEntries: GameEntry[] = entriesForKey("pacmanEntries");
-export const doomEntries: GameEntry[] = entriesForKey("doomEntries");
-export const minecraftEntries: GameEntry[] = entriesForKey("minecraftEntries");
-export const quakeEntries: GameEntry[] = entriesForKey("quakeEntries");
+export const tetrisLiteEntries: GameEntry[] = entriesForDataSlug("tetris-lite");
+export const breakoutEntries: GameEntry[] = entriesForDataSlug("breakout");
+export const twoZeroFourEightEntries: GameEntry[] = entriesForDataSlug("2048");
+export const asteroidsEntries: GameEntry[] = entriesForDataSlug("asteroids");
+export const pacmanEntries: GameEntry[] = entriesForDataSlug("pacman");
+export const doomEntries: GameEntry[] = entriesForDataSlug("doom");
+export const minecraftEntries: GameEntry[] = entriesForDataSlug("minecraft");
+export const quakeEntries: GameEntry[] = entriesForDataSlug("quake");
 
 export const entriesByGame: Record<GameSlug, GameEntry[]> = {
   snake: snakeEntries,
