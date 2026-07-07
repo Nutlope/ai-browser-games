@@ -1,4 +1,4 @@
-import { mkdir, writeFile } from "node:fs/promises";
+import { mkdir, readFile, writeFile } from "node:fs/promises";
 import path from "node:path";
 import process from "node:process";
 import { fileURLToPath } from "node:url";
@@ -8,47 +8,22 @@ const __dirname = path.dirname(__filename);
 const rootDir = path.resolve(__dirname, "..");
 const outputDir = path.join(rootDir, "generated");
 const outputPath = path.join(outputDir, "games.json");
-const reportPath = path.join(outputDir, "together-report.json");
 const MAX_OUTPUT_TOKENS = 20000;
 const REQUEST_TIMEOUT_MS = 250000;
 
 const apiKey = process.env.TOGETHER_API_KEY;
 
-const models = [
-  {
-    id: "deepseek-ai/DeepSeek-V4-Pro",
-    label: "DeepSeek V4 Pro",
-    provider: "Together",
-    inputPricePerMillion: 2.1,
-    outputPricePerMillion: 4.4,
-  },
-  {
-    id: "moonshotai/Kimi-K2.7-Code",
-    label: "Kimi K2.7 Code",
-    provider: "Together",
-    inputPricePerMillion: 0.95,
-    outputPricePerMillion: 4,
-  },
-  {
-    id: "MiniMaxAI/MiniMax-M3",
-    label: "MiniMax M3",
-    provider: "Together",
-    inputPricePerMillion: 0.3,
-    outputPricePerMillion: 1.2,
-  },
+// Models to add to generated/games.json. Unlike generate-games.mjs, this script
+// is additive: it only generates the models listed here and merges them into the
+// existing data by entry id, so every other model's committed results are kept.
+// Pricing is per million tokens and mirrors Together's published model pricing.
+const MODELS_TO_ADD = [
   {
     id: "zai-org/GLM-5.2",
     label: "GLM 5.2",
     provider: "Together",
     inputPricePerMillion: 1.4,
     outputPricePerMillion: 4.4,
-  },
-  {
-    id: "nvidia/nemotron-3-ultra-550b-a55b",
-    label: "Nemotron 3 Ultra 550B",
-    provider: "Together",
-    inputPricePerMillion: 0.60,
-    outputPricePerMillion: 3.60,
   },
 ];
 
@@ -176,6 +151,36 @@ function computeCostUsd(usage, model) {
   return Number(cost.toFixed(6));
 }
 
+async function loadExistingOutput() {
+  try {
+    const file = await readFile(outputPath, "utf8");
+    const parsed = JSON.parse(file);
+
+    return Object.fromEntries(
+      gamePrompts.map((gamePrompt) => [
+        gamePrompt.key,
+        Array.isArray(parsed[gamePrompt.key]) ? parsed[gamePrompt.key] : [],
+      ]),
+    );
+  } catch {
+    return Object.fromEntries(gamePrompts.map((gamePrompt) => [gamePrompt.key, []]));
+  }
+}
+
+// Merge new entries into existing ones by id: an existing entry with the same id
+// is replaced, everything else is preserved. This is what keeps the add additive.
+function mergeEntries(existingEntries, nextEntries) {
+  const byId = new Map(existingEntries.map((entry) => [entry.id, entry]));
+
+  for (const entry of nextEntries) {
+    byId.set(entry.id, entry);
+  }
+
+  return Array.from(byId.values()).sort((left, right) =>
+    left.label.localeCompare(right.label),
+  );
+}
+
 async function createGame(model, gamePrompt) {
   const response = await fetch("https://api.together.xyz/v1/chat/completions", {
     method: "POST",
@@ -258,43 +263,39 @@ async function attemptCreateGame(model, gamePrompt, retries = 3) {
 async function main() {
   if (!apiKey) {
     console.error(
-      "Missing TOGETHER_API_KEY. Add it to your environment before running pnpm generate:games.",
+      "Missing TOGETHER_API_KEY. Add it to your environment before running pnpm add:together-model.",
     );
     process.exit(1);
   }
 
-  const output = Object.fromEntries(
+  if (MODELS_TO_ADD.length === 0) {
+    console.error("MODELS_TO_ADD is empty. Add at least one model to generate.");
+    process.exit(1);
+  }
+
+  const generated = Object.fromEntries(
     gamePrompts.map((gamePrompt) => [gamePrompt.key, []]),
   );
   const failures = [];
-  const successes = [];
   let successCount = 0;
 
   for (const gamePrompt of gamePrompts) {
     process.stdout.write(
-      `Generating ${gamePrompt.game} for ${models.length} models in parallel...\n`,
+      `Generating ${gamePrompt.game} for ${MODELS_TO_ADD.length} model(s) to add...\n`,
     );
 
     const results = await Promise.allSettled(
-      models.map(async (model) => {
+      MODELS_TO_ADD.map(async (model) => {
         const entry = await attemptCreateGame(model, gamePrompt, 3);
         return { entry, model };
       }),
     );
 
     results.forEach((result, index) => {
-      const model = models[index];
+      const model = MODELS_TO_ADD[index];
 
       if (result.status === "fulfilled") {
-        const { entry } = result.value;
-        output[gamePrompt.key].push(entry);
-        successes.push({
-          model: model.id,
-          game: gamePrompt.game,
-          outputTokens: entry.outputTokens ?? null,
-          totalTokens: entry.totalTokens ?? null,
-          costUsd: entry.generationCostUsd ?? null,
-        });
+        generated[gamePrompt.key].push(result.value.entry);
         successCount += 1;
         return;
       }
@@ -310,42 +311,28 @@ async function main() {
     });
   }
 
-  await mkdir(outputDir, { recursive: true });
-  await writeFile(
-    reportPath,
-    JSON.stringify(
-      {
-        provider: "Together",
-        generatedAt: new Date().toISOString(),
-        successCount,
-        failureCount: failures.length,
-        successes,
-        failures,
-      },
-      null,
-      2,
-    ) + "\n",
-    "utf8",
-  );
-
   if (successCount === 0) {
     throw new Error(
       "No generations succeeded, so generated/games.json was left unchanged.",
     );
   }
 
-  const nextOutput = Object.fromEntries(
+  // Merge the freshly generated entries into whatever is already committed, so
+  // existing models keep their results and only the added models are written.
+  const existing = await loadExistingOutput();
+  const merged = Object.fromEntries(
     gamePrompts.map((gamePrompt) => [
       gamePrompt.key,
-      output[gamePrompt.key].sort((left, right) =>
-        left.label.localeCompare(right.label),
-      ),
+      mergeEntries(existing[gamePrompt.key], generated[gamePrompt.key]),
     ]),
   );
 
-  await writeFile(outputPath, JSON.stringify(nextOutput, null, 2) + "\n", "utf8");
+  await mkdir(outputDir, { recursive: true });
+  await writeFile(outputPath, JSON.stringify(merged, null, 2) + "\n", "utf8");
 
-  process.stdout.write(`Wrote ${outputPath}\n`);
+  process.stdout.write(
+    `Added ${successCount} generation(s) for ${MODELS_TO_ADD.map((m) => m.label).join(", ")} to ${outputPath}\n`,
+  );
 
   if (failures.length > 0) {
     process.stderr.write("Failed generations:\n");
