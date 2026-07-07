@@ -3,7 +3,7 @@ export function formatCost(value: number | null | undefined) {
     return "--";
   }
 
-  return `$${value.toFixed(4)}`;
+  return `$${value.toFixed(3)}`;
 }
 
 export function formatTokens(value: number | null | undefined) {

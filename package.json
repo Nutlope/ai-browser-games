@@ -8,7 +8,8 @@
     "start": "next start",
     "lint": "next lint",
     "generate:games-together": "node scripts/generate-games.mjs",
-    "generate:games-other": "node scripts/generate-openrouter-games.mjs"
+    "generate:games-other": "node scripts/generate-openrouter-games.mjs",
+    "add:together-model": "node scripts/add-together-model.mjs"
   },
   "dependencies": {
     "motion": "^12.40.0",
