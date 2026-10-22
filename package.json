@@ -6,21 +6,20 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint",
     "generate:games-together": "node scripts/generate-games.mjs",
     "generate:games-other": "node scripts/generate-openrouter-games.mjs",
     "add:together-model": "node scripts/add-together-model.mjs"
   },
   "dependencies": {
     "motion": "^12.40.0",
-    "next": "16.2.6",
-    "react": "19.0.0",
-    "react-dom": "19.0.0"
+    "next": "16.3.8",
+    "react": "19.2.9",
+    "react-dom": "19.2.9"
   },
   "devDependencies": {
     "@types/node": "22.13.14",
-    "@types/react": "19.0.12",
-    "@types/react-dom": "19.0.4",
+    "@types/react": "19.2.18",
+    "@types/react-dom": "19.2.7",
     "typescript": "5.8.2"
   }
 }
