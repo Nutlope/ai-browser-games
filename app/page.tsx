@@ -75,7 +75,7 @@ export default function HomePage() {
           <HeroLogos models={models} />
           <div className={styles.heroCopy}>
             <a
-              href="https://www.together.ai"
+              href="https://togetherai.link/?utm_source=ai-browser-games&utm_medium=referral&utm_campaign=example-app"
               target="_blank"
               rel="noreferrer"
               className={styles.heroPill}

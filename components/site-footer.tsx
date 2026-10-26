@@ -12,7 +12,7 @@ export function SiteFooter() {
         Model logos are trademarks of their respective owners, shown for identification only.
       </p>
       <a
-        href="https://www.together.ai"
+        href="https://togetherai.link/?utm_source=ai-browser-games&utm_medium=referral&utm_campaign=example-app"
         target="_blank"
         rel="noreferrer"
         className={styles.madeBy}
