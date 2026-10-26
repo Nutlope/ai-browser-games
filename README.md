@@ -28,7 +28,7 @@ The benchmark asks each model to build the same three self-contained browser gam
 - **Framework**: [Next.js](https://nextjs.org/) App Router
 - **UI**: React 19, TypeScript, CSS Modules
 - **Animation**: [Motion](https://motion.dev/)
-- **Model providers**: [Together AI](https://together.ai/) and [OpenRouter](https://openrouter.ai/)
+- **Model providers**: [Together AI](https://togetherai.link/?utm_source=ai-browser-games&utm_medium=referral&utm_campaign=example-app) and [OpenRouter](https://openrouter.ai/)
 - **Package manager**: pnpm
 - **Data**: committed JSON files in `generated/`
 
